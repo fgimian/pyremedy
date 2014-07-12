@@ -46,6 +46,9 @@ class ARS(object):
         #: A list of warnings or errors generated from each call to Remedy ARS
         self.status = arh.ARStatusList()
 
+        #: A list of tuples containing errors that occurred on the last call
+        self.errors = []
+
         #: A simple cache containing all schemas
         self.schema_cache = None
 
@@ -87,9 +90,12 @@ class ARS(object):
                 byref(self.status)
             ) >= arh.AR_RETURN_ERROR
         ):
-            error = self._prepare_error()
+            self._update_errors()
             self.arlib.FreeARStatusList(byref(self.status), arh.FALSE)
-            raise ARSError(error)
+            raise ARSError(
+                'Enable to perform initialisation against server '
+                '{}'.format(server)
+            )
 
         self.arlib.FreeARStatusList(byref(self.status), arh.FALSE)
 
@@ -111,9 +117,12 @@ class ARS(object):
                     byref(self.status)
                 ) >= arh.AR_RETURN_ERROR
             ):
-                error = self._prepare_error()
+                self._update_errors()
                 self.arlib.FreeARStatusList(byref(self.status), arh.FALSE)
-                raise ARSError(error)
+                raise ARSError(
+                    'Unable to set the port to {} and RPC program number to '
+                    '{} for server {}'.format(port, rpc_program_number, server)
+                )
 
             self.arlib.FreeARStatusList(byref(self.status), arh.FALSE)
 
@@ -129,9 +138,9 @@ class ARS(object):
                 byref(self.status)
             ) >= arh.AR_RETURN_ERROR
         ):
-            error = self._prepare_error()
+            self._update_errors()
             self.arlib.FreeARStatusList(byref(self.status), arh.FALSE)
-            raise ARSError(error)
+            raise ARSError('Enable to terminate the server connection')
 
         self.arlib.FreeARStatusList(byref(self.status), arh.FALSE)
 
@@ -171,10 +180,10 @@ class ARS(object):
                 byref(self.status)
             ) >= arh.AR_RETURN_ERROR
         ):
-            error = self._prepare_error()
+            self._update_errors()
             self.arlib.FreeARNameList(byref(schema_list), arh.FALSE)
             self.arlib.FreeARStatusList(byref(self.status), arh.FALSE)
-            raise ARSError(error)
+            raise ARSError('Unable to obtain a list of schemas')
 
         # Save the schema list into the cache
         self.schema_cache = [
@@ -214,9 +223,8 @@ class ARS(object):
         for field in fields:
             if field not in self.field_name_cache[schema]:
                 raise ARSError(
-                    'A field with name {} does not exist in schema {}'.format(
-                        field, schema
-                    )
+                    'A field with name {} does not exist in schema '
+                    '{}'.format(field, schema)
                 )
 
         qualifier = arh.ARQualifierStruct()
@@ -243,10 +251,13 @@ class ARS(object):
                 byref(self.status)
             ) >= arh.AR_RETURN_ERROR
         ):
-            error = self._prepare_error()
+            self._update_errors()
             self.arlib.FreeARQualifierStruct(byref(self.qualifier), arh.FALSE)
             self.arlib.FreeARStatusList(byref(self.status), arh.FALSE)
-            raise ARSError(error)
+            raise ARSError(
+                'Unable to load the qualifier using the provided '
+                'qualification string for schema {}'.format(schema)
+            )
 
         # Note that we don't run FreeARQualifierStruct here as we need the
         # qualifier for the next call
@@ -305,14 +316,17 @@ class ARS(object):
                 byref(self.status)
             ) >= arh.AR_RETURN_ERROR
         ):
-            error = self._prepare_error()
+            self._update_errors()
             self.arlib.FreeARQualifierStruct(byref(qualifier), arh.FALSE)
             self.arlib.FreeAREntryListFieldList(byref(field_list), arh.FALSE)
             self.arlib.FreeAREntryListFieldValueList(
                 byref(entry_list), arh.FALSE
             )
             self.arlib.FreeARStatusList(byref(self.status), arh.FALSE)
-            raise ARSError(error)
+            raise ARSError(
+                'Unable to obtain a list of entries using the provided '
+                'qualification string for schema {}'.format(schema)
+            )
 
         entries = []
 
@@ -405,10 +419,12 @@ class ARS(object):
                 byref(self.status)
             ) >= arh.AR_RETURN_ERROR
         ):
-            error = self._prepare_error()
+            self._update_errors()
             self.arlib.FreeARInternalIdList(byref(field_id_list), arh.FALSE)
             self.arlib.FreeARStatusList(byref(self.status), arh.FALSE)
-            raise ARSError(error)
+            raise ARSError(
+                'Unable to obtain field ids for schema {}'.format(schema)
+            )
 
         # Note that we don't run FreeARInternalIdList here as we need the
         # field_id_list for the next call
@@ -483,10 +499,13 @@ class ARS(object):
                 byref(self.status)
             ) >= arh.AR_RETURN_ERROR
         ):
-            error = self._prepare_error()
+            self._update_errors()
             self.arlib.FreeARNameList(byref(field_name_list), arh.FALSE)
             self.arlib.FreeARStatusList(byref(self.status), arh.FALSE)
-            raise ARSError(error)
+            raise ARSError(
+                'Unable to obtain field information for schema '
+                '{}'.format(schema)
+            )
 
         # Initialise the name and enum caches for this schema
         self.field_name_cache[schema] = {}
@@ -545,9 +564,7 @@ class ARS(object):
 
                     raise ARSError(
                         'The field id {} for schema {} is a query enum which '
-                        'is not supported by PyRemedy'.format(
-                            field_id, schema
-                        )
+                        'is not supported by PyRemedy'.format(field_id, schema)
                     )
 
         self.arlib.FreeARInternalIdList(byref(field_id_list), arh.FALSE)
@@ -559,5 +576,21 @@ class ARS(object):
             i: n for n, i in self.field_name_cache[schema].iteritems()
         }
 
-    def _prepare_error(self):
-        return 'An unknown error has occurred'
+    def _update_errors(self):
+        """Updates the errors attribute with any errors that occurred on the
+        last operation based on the status struct
+        """
+
+        # Clear previous errors
+        self.errors = []
+
+        # Go through each error present and add them to the errors list
+        for i in range(self.status.numItems):
+            message_number = self.status.statusList[i].messageNum
+            message_text = str(self.status.statusList[i].messageText)
+            appended_text = None
+
+            if self.status.statusList[i].appendedText:
+                appended_text = str(self.status.statusList[i].appendedText)
+
+            self.errors.append((message_number, message_text, appended_text))
