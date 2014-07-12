@@ -1,0 +1,16 @@
+Core codebase:
+ ☐ Clean up reverse field mapping implementation
+ ☐ Ensure that Free functions always run regardless of exceptions
+ ☐ Repair error handling and exception raising
+ ☐ Determine date timezone conversion
+ ☐ Properly understand the columnWidth and separator fields when creating field lists
+
+Additional features:
+ ☐ Support for Windows
+ ☐ Determine if we can test authentication against the user
+ ☐ Implement multiple caching backends
+ ☐ Determine if we can return field names in the order they are returned
+ ☐ Deal with as many types of data as possible
+ ☐ Implement query enums if possible
+ ☐ Write unit tests for the library
+ ☐ Python 3 compatibility
