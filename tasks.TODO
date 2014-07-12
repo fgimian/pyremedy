@@ -1,7 +1,6 @@
 Core codebase:
  ☐ Clean up reverse field mapping implementation
  ☐ Ensure that Free functions always run regardless of exceptions
- ☐ Repair error handling and exception raising
  ☐ Determine date timezone conversion
  ☐ Properly understand the columnWidth and separator fields when creating field lists
 
