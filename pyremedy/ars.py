@@ -252,7 +252,7 @@ class ARS(object):
             ) >= arh.AR_RETURN_ERROR
         ):
             self._update_errors()
-            self.arlib.FreeARQualifierStruct(byref(self.qualifier), arh.FALSE)
+            self.arlib.FreeARQualifierStruct(byref(qualifier), arh.FALSE)
             self.arlib.FreeARStatusList(byref(self.status), arh.FALSE)
             raise ARSError(
                 'Unable to load the qualifier using the provided '
@@ -334,6 +334,14 @@ class ARS(object):
             # Entries containing more than one id are not supported
             # (ids are supposed to be unique aren't they?)
             if entry_list.entryList[i].entryId.numItems != 1:
+                self.arlib.FreeARQualifierStruct(byref(qualifier), arh.FALSE)
+                self.arlib.FreeAREntryListFieldList(
+                    byref(field_list), arh.FALSE
+                )
+                self.arlib.FreeAREntryListFieldValueList(
+                    byref(entry_list), arh.FALSE
+                )
+                self.arlib.FreeARStatusList(byref(self.status), arh.FALSE)
                 raise ARSError(
                     'One or more entries contained multiple IDs that are not '
                     'supported by PyRemedy'
@@ -369,6 +377,16 @@ class ARS(object):
                         values_list.fieldValueList[j].value.u.timeVal
                     )
                 else:
+                    self.arlib.FreeARQualifierStruct(
+                        byref(qualifier), arh.FALSE
+                    )
+                    self.arlib.FreeAREntryListFieldList(
+                        byref(field_list), arh.FALSE
+                    )
+                    self.arlib.FreeAREntryListFieldValueList(
+                        byref(entry_list), arh.FALSE
+                    )
+                    self.arlib.FreeARStatusList(byref(self.status), arh.FALSE)
                     raise ARSError(
                         'An unknown data type was encountered for field name '
                         '{} on schema {}'.format(field_name, schema)
@@ -500,6 +518,8 @@ class ARS(object):
             ) >= arh.AR_RETURN_ERROR
         ):
             self._update_errors()
+            self.arlib.FreeARInternalIdList(byref(field_id_list), arh.FALSE)
+            self.arlib.FreeARBooleanList(byref(field_exist_list), arh.FALSE)
             self.arlib.FreeARNameList(byref(field_name_list), arh.FALSE)
             self.arlib.FreeARStatusList(byref(self.status), arh.FALSE)
             raise ARSError(
@@ -554,7 +574,6 @@ class ARS(object):
                 # Process query enums mappings
                 else:
                     # TODO: Implement query enums if possible
-
                     # query_list = field_enum_limits_list.u.queryList
                     # print("schema: %s" % query_list.schema)
                     # print("server: %s" % query_list.server)
@@ -562,6 +581,16 @@ class ARS(object):
                     # print("nameField: %d" % query_list.nameField)
                     # print("numberField: %d" % query_list.numberField)
 
+                    self.arlib.FreeARInternalIdList(
+                        byref(field_id_list), arh.FALSE
+                    )
+                    self.arlib.FreeARBooleanList(
+                        byref(field_exist_list), arh.FALSE
+                    )
+                    self.arlib.FreeARNameList(
+                        byref(field_name_list), arh.FALSE
+                    )
+                    self.arlib.FreeARStatusList(byref(self.status), arh.FALSE)
                     raise ARSError(
                         'The field id {} for schema {} is a query enum which '
                         'is not supported by PyRemedy'.format(field_id, schema)
