@@ -2,7 +2,6 @@ Essential improvements:
  ☐ Determine date timezone conversion
  ☐ Determine what's going on with the string type in arh.py
  ☐ Determine if we can test authentication against the user
- ☐ Complete type conversions for modification and creation of entries
  ☐ Implement the ability to get entries based on their id
 
 Additional features:
