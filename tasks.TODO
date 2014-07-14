@@ -7,7 +7,6 @@ Next steps:
  ☐ Implement the ability to create dockets
  ☐ Implement the ability to delete dockets
  ☐ Determine if we can test authentication against the user
- ☐ Determine if we can return field names in the order they are returned
 
 Additional features:
  ☐ Deal with the currency data type if possible
