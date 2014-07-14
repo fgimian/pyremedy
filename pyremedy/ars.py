@@ -50,16 +50,19 @@ class ARS(object):
         #: A list of tuples containing errors that occurred on the last call
         self.errors = []
 
-        #: A simple cache containing all schemas
+        #: A cache containing all schemas
         self.schema_cache = None
 
-        #: A simple cache containing field id to name mappings for schemas
+        #: A cache containing field id to name mappings for schemas
         self.field_id_to_name_cache = {}
 
-        #: A simple cache containing field name to id mappings for schemas
+        #: A cache containing field name to id mappings for schemas
         self.field_name_to_id_cache = {}
 
-        #: A simple cache containing field enum mappings for a particular field
+        #: A cache containing field id to type mappings for schemas
+        self.field_id_to_type_cache = {}
+
+        #: A cache containing field enum mappings for a particular field
         self.field_enum_cache = {}
 
         # Initialise control to 0 for safety
@@ -446,6 +449,7 @@ class ARS(object):
         if (
             schema in self.field_id_to_name_cache and
             schema in self.field_name_to_id_cache and
+            schema in self.field_id_to_type_cache and
             schema in self.field_enum_cache
         ):
             return
@@ -568,6 +572,7 @@ class ARS(object):
         # Initialise the name and enum caches for this schema
         self.field_id_to_name_cache[schema] = OrderedDict()
         self.field_name_to_id_cache[schema] = OrderedDict()
+        self.field_id_to_type_cache[schema] = OrderedDict()
         self.field_enum_cache[schema] = OrderedDict()
 
         for i in range(field_id_list.numItems):
@@ -581,6 +586,9 @@ class ARS(object):
 
             # Save the field name to id mapping in the cache
             self.field_name_to_id_cache[schema][field_name] = field_id
+
+            # Save the field id to type mapping in the cache
+            self.field_id_to_type_cache[schema][field_id] = data_type
 
             # Retrieve enum values if this field is an enum type
             if data_type == arh.AR_DATA_TYPE_ENUM:
