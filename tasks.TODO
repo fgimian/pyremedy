@@ -2,9 +2,9 @@ Essential improvements:
  ☐ Clean up reverse field mapping implementation
  ☐ Determine date timezone conversion
  ☐ Determine what's going on with the string type in arh.py
- ☐ Deal with as many types of data as possible
 
 Additional features:
+ ☐ Deal with the currency data type if possible
  ☐ Support for Windows
  ☐ Determine if we can test authentication against the user
  ☐ Implement multiple caching backends
