@@ -1,5 +1,6 @@
 from __future__ import print_function
 
+from collections import OrderedDict
 from ctypes import (
     CDLL, sizeof, cast, byref, memset, c_char_p, c_uint, POINTER
 )
@@ -202,7 +203,7 @@ class ARS(object):
         """
 
         self.update_fields(schema)
-        return sorted(self.field_name_to_id_cache[schema].keys())
+        return self.field_name_to_id_cache[schema].keys()
 
     def query(self, schema, qual, fields):
         """Runs a specified qualification string against a chosen schema and
@@ -558,9 +559,9 @@ class ARS(object):
             )
 
         # Initialise the name and enum caches for this schema
-        self.field_id_to_name_cache[schema] = {}
-        self.field_name_to_id_cache[schema] = {}
-        self.field_enum_cache[schema] = {}
+        self.field_id_to_name_cache[schema] = OrderedDict()
+        self.field_name_to_id_cache[schema] = OrderedDict()
+        self.field_enum_cache[schema] = OrderedDict()
 
         for i in range(field_id_list.numItems):
             # Save the field name to id mapping in the cache
