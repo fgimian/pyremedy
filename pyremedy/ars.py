@@ -53,10 +53,10 @@ class ARS(object):
         self.schema_cache = None
 
         #: A simple cache containing field id to name mappings for schemas
-        self.field_name_cache = {}
+        self.field_id_to_name_cache = {}
 
         #: A simple cache containing field name to id mappings for schemas
-        self.field_name_cache_rev = {}
+        self.field_name_to_id_cache = {}
 
         #: A simple cache containing field enum mappings for a particular field
         self.field_enum_cache = {}
@@ -202,7 +202,7 @@ class ARS(object):
         """
 
         self.update_fields(schema)
-        return sorted(self.field_name_cache[schema].keys())
+        return sorted(self.field_name_to_id_cache[schema].keys())
 
     def query(self, schema, qual, fields):
         """Runs a specified qualification string against a chosen schema and
@@ -221,7 +221,7 @@ class ARS(object):
         # so that we aren't in the middle of allocating memory to the
         # AREntryListFieldList struct when we realise a field is invalid.
         for field in fields:
-            if field not in self.field_name_cache[schema]:
+            if field not in self.field_name_to_id_cache[schema]:
                 raise ARSError(
                     'A field with name {} does not exist in schema '
                     '{}'.format(field, schema)
@@ -271,10 +271,9 @@ class ARS(object):
             ), POINTER(arh.AREntryListFieldStruct)
         )
 
-        # TODO: properly understand the columnWidth and separator fields here
         for i, field in enumerate(fields):
             field_list.fieldsList[i].fieldId = (
-                self.field_name_cache[schema][field]
+                self.field_name_to_id_cache[schema][field]
             )
             # From the C API Reference document (Chapter 3 / Entries)
             # For ARGetListEntryWithFields, set this value to a number greater
@@ -361,7 +360,7 @@ class ARS(object):
 
             for j in range(values_list.numItems):
                 field_id = values_list.fieldValueList[j].fieldId
-                field_name = self.field_name_cache_rev[schema][field_id]
+                field_name = self.field_id_to_name_cache[schema][field_id]
                 data_type = values_list.fieldValueList[j].value.dataType
 
                 # Extract the appropriate piece of data depending on its type
@@ -436,7 +435,11 @@ class ARS(object):
         """
 
         # Use the cache if possible
-        if schema in self.field_name_cache and schema in self.field_enum_cache:
+        if (
+            schema in self.field_id_to_name_cache and
+            schema in self.field_name_to_id_cache and
+            schema in self.field_enum_cache
+        ):
             return
 
         # Retrieve a list of IDs for a given form
@@ -555,8 +558,8 @@ class ARS(object):
             )
 
         # Initialise the name and enum caches for this schema
-        self.field_name_cache[schema] = {}
-        self.field_name_cache_rev[schema] = {}
+        self.field_id_to_name_cache[schema] = {}
+        self.field_name_to_id_cache[schema] = {}
         self.field_enum_cache[schema] = {}
 
         for i in range(field_id_list.numItems):
@@ -565,8 +568,11 @@ class ARS(object):
             field_name = field_name_list.nameList[i].value
             data_type = field_limits_list.fieldLimitList[i].dataType
 
+            # Save the field id to name mapping in the cache
+            self.field_id_to_name_cache[schema][field_id] = field_name
+
             # Save the field name to id mapping in the cache
-            self.field_name_cache[schema][field_name] = field_id
+            self.field_name_to_id_cache[schema][field_name] = field_id
 
             # Retrieve enum values if this field is an enum type
             if data_type == arh.AR_DATA_TYPE_ENUM:
@@ -627,10 +633,6 @@ class ARS(object):
         self.arlib.FreeARBooleanList(byref(field_exist_list), arh.FALSE)
         self.arlib.FreeARNameList(byref(field_name_list), arh.FALSE)
         self.arlib.FreeARStatusList(byref(self.status), arh.FALSE)
-
-        self.field_name_cache_rev[schema] = {
-            i: n for n, i in self.field_name_cache[schema].iteritems()
-        }
 
     def _update_errors(self):
         """Updates the errors attribute with any errors that occurred on the

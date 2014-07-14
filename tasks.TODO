@@ -1,17 +1,18 @@
 Essential improvements:
- ☐ Clean up reverse field mapping implementation
  ☐ Determine date timezone conversion
  ☐ Determine what's going on with the string type in arh.py
 
+Next steps:
+ ☐ Implement the ability to modify dockets
+ ☐ Implement the ability to create dockets
+ ☐ Implement the ability to delete dockets
+ ☐ Determine if we can test authentication against the user
+ ☐ Determine if we can return field names in the order they are returned
+
 Additional features:
  ☐ Deal with the currency data type if possible
- ☐ Support for Windows
- ☐ Determine if we can test authentication against the user
  ☐ Implement multiple caching backends
- ☐ Determine if we can return field names in the order they are returned
  ☐ Implement query enums if possible
  ☐ Write unit tests for the library
+ ☐ Support for Windows
  ☐ Python 3 compatibility
- ☐ Implement the ability to create dockets
- ☐ Implement the ability to modify dockets
- ☐ Implement the ability to delete dockets
