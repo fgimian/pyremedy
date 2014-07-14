@@ -1,12 +1,12 @@
 Essential improvements:
  ☐ Determine date timezone conversion
  ☐ Determine what's going on with the string type in arh.py
+ ☐ Determine if we can test authentication against the user
 
 Next steps:
  ☐ Implement the ability to modify dockets
  ☐ Implement the ability to create dockets
  ☐ Implement the ability to delete dockets
- ☐ Determine if we can test authentication against the user
 
 Additional features:
  ☐ Deal with the currency data type if possible
