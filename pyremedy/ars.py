@@ -62,8 +62,11 @@ class ARS(object):
         #: A cache containing field id to type mappings for schemas
         self.field_id_to_type_cache = {}
 
-        #: A cache containing field enum mappings for a particular field
-        self.field_enum_cache = {}
+        #: A cache containing enum id to name mappings for a particular field
+        self.enum_id_to_name_cache = {}
+
+        #: A cache containing enum name to id mappings for a particular field
+        self.enum_name_to_id_cache = {}
 
         # Initialise control to 0 for safety
         memset(byref(self.control), 0, sizeof(arh.ARControlStruct))
@@ -390,7 +393,7 @@ class ARS(object):
                     )
                 elif data_type == arh.AR_DATA_TYPE_ENUM:
                     entry_values[field_name] = (
-                        self.field_enum_cache[schema][field_id][
+                        self.enum_id_to_name_cache[schema][field_id][
                             values_list.fieldValueList[j].value.u.enumVal
                         ]
                     )
@@ -482,9 +485,9 @@ class ARS(object):
             if data_type == arh.AR_DATA_TYPE_NULL:
                 pass
             elif data_type == arh.AR_DATA_TYPE_INTEGER:
-                field_value_list.fieldValueList[i].value.u.intVal = int(value)
+                field_value_list.fieldValueList[i].value.u.intVal = value
             elif data_type == arh.AR_DATA_TYPE_REAL:
-                field_value_list.fieldValueList[i].value.u.realVal = float(value)
+                field_value_list.fieldValueList[i].value.u.realVal = value
             elif data_type == arh.AR_DATA_TYPE_CHAR:
                 # Note that we must allocate a new block of memory using
                 # strdup or we end up with a nasty invalid pointer error
@@ -492,13 +495,16 @@ class ARS(object):
                     self.clib.strdup(value)
                 )
             elif data_type == arh.AR_DATA_TYPE_ENUM:
-                # self.field_enum_cache[schema][field_id]
-                field_value_list.fieldValueList[i].value.u.enumVal = int(value)
+                enum_id = self.enum_name_to_id_cache[schema][field_id][value]
+                field_value_list.fieldValueList[i].value.u.enumVal = enum_id
             elif data_type == arh.AR_DATA_TYPE_TIME:
-                field_value_list.fieldValueList[i].value.u.timeVal = value
+                field_value_list.fieldValueList[i].value.u.timeVal = (
+                    value.strftime('%s')
+                )
             else:
                 raise ARSError(
-                    'Unable to create an entry for schema {}'.format(schema)
+                    'An unknown data type was encountered for field name {} '
+                    'on schema {}'.format(field_name, schema)
                 )
 
         if (
@@ -579,15 +585,35 @@ class ARS(object):
 
         for i, (field_name, value) in enumerate(entry_values.items()):
             field_id = self.field_name_to_id_cache[schema][field_name]
+            data_type = self.field_id_to_type_cache[schema][field_id]
+
             field_value_list.fieldValueList[i].fieldId = field_id
-            field_value_list.fieldValueList[i].value.dataType = (
-                self.field_id_to_type_cache[schema][field_id]
-            )
-            # Note that we must allocate a new block of memory using strdup
-            # or we end up with a nasty invalid pointer error
-            field_value_list.fieldValueList[i].value.u.charVal.data = (
-                self.clib.strdup(value)
-            )
+            field_value_list.fieldValueList[i].value.dataType = data_type
+
+            if data_type == arh.AR_DATA_TYPE_NULL:
+                pass
+            elif data_type == arh.AR_DATA_TYPE_INTEGER:
+                field_value_list.fieldValueList[i].value.u.intVal = value
+            elif data_type == arh.AR_DATA_TYPE_REAL:
+                field_value_list.fieldValueList[i].value.u.realVal = value
+            elif data_type == arh.AR_DATA_TYPE_CHAR:
+                # Note that we must allocate a new block of memory using
+                # strdup or we end up with a nasty invalid pointer error
+                field_value_list.fieldValueList[i].value.u.charVal.data = (
+                    self.clib.strdup(value)
+                )
+            elif data_type == arh.AR_DATA_TYPE_ENUM:
+                enum_id = self.enum_name_to_id_cache[schema][field_id][value]
+                field_value_list.fieldValueList[i].value.u.enumVal = enum_id
+            elif data_type == arh.AR_DATA_TYPE_TIME:
+                field_value_list.fieldValueList[i].value.u.timeVal = (
+                    value.strftime('%s')
+                )
+            else:
+                raise ARSError(
+                    'An unknown data type was encountered for field name {} '
+                    'on schema {}'.format(field_name, schema)
+                )
 
         if (
             self.arlib.ARSetEntry(
@@ -641,7 +667,8 @@ class ARS(object):
             schema in self.field_id_to_name_cache and
             schema in self.field_name_to_id_cache and
             schema in self.field_id_to_type_cache and
-            schema in self.field_enum_cache
+            schema in self.enum_id_to_name_cache and
+            schema in self.enum_name_to_id_cache
         ):
             return
 
@@ -764,7 +791,8 @@ class ARS(object):
         self.field_id_to_name_cache[schema] = OrderedDict()
         self.field_name_to_id_cache[schema] = OrderedDict()
         self.field_id_to_type_cache[schema] = OrderedDict()
-        self.field_enum_cache[schema] = OrderedDict()
+        self.enum_id_to_name_cache[schema] = OrderedDict()
+        self.enum_name_to_id_cache[schema] = OrderedDict()
 
         for i in range(field_id_list.numItems):
             # Save the field name to id mapping in the cache
@@ -784,7 +812,8 @@ class ARS(object):
             # Retrieve enum values if this field is an enum type
             if data_type == arh.AR_DATA_TYPE_ENUM:
                 # Initialise the enum entries for this field
-                self.field_enum_cache[schema][field_id] = {}
+                self.enum_id_to_name_cache[schema][field_id] = {}
+                self.enum_name_to_id_cache[schema][field_id] = {}
 
                 field_enum_limits_list = (
                     field_limits_list.fieldLimitList[i].u.enumLimits
@@ -797,8 +826,11 @@ class ARS(object):
                     for j in range(regular_list.numItems):
                         enum_id = j
                         enum_value = regular_list.nameList[j].value
-                        self.field_enum_cache[schema][field_id][enum_id] = (
+                        self.enum_id_to_name_cache[schema][field_id][enum_id] = (
                             enum_value
+                        )
+                        self.enum_name_to_id_cache[schema][field_id][enum_value] = (
+                            enum_id
                         )
 
                 # Process custom enums mappings
@@ -807,8 +839,11 @@ class ARS(object):
                     for j in range(custom_list.numItems):
                         enum_id = custom_list.enumItemList[j].itemNumber
                         enum_value = custom_list.enumItemList[j].itemName
-                        self.field_enum_cache[schema][field_id][enum_id] = (
+                        self.enum_id_to_name_cache[schema][field_id][enum_id] = (
                             enum_value
+                        )
+                        self.enum_name_to_id_cache[schema][field_id][enum_value] = (
+                            enum_id
                         )
 
                 # Process query enums mappings
