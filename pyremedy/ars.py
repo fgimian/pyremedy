@@ -424,7 +424,8 @@ class ARS(object):
                         'An unknown data type was encountered for field name '
                         '{} on schema {}'.format(field_name, schema)
                     )
-                entries.append((entry_id, entry_values))
+
+            entries.append((entry_id, entry_values))
 
         self.arlib.FreeARQualifierStruct(byref(qualifier_struct), arh.FALSE)
         self.arlib.FreeAREntryListFieldList(byref(field_list), arh.FALSE)
