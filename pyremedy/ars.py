@@ -276,8 +276,13 @@ class ARS(object):
             field_list.fieldsList[i].fieldId = (
                 self.field_name_cache[schema][field]
             )
+            # From the C API Reference document (Chapter 3 / Entries)
+            # For ARGetListEntryWithFields, set this value to a number greater
+            # than 0.
             field_list.fieldsList[i].columnWidth = 1
-            field_list.fieldsList[i].separator = ''
+            # From the C API Reference document (Chapter 3 / Entries)
+            # For ARGetListEntryWithFields, set this value to one blank space.
+            field_list.fieldsList[i].separator = ' '
 
         num_matches = c_uint()
         entry_list = arh.AREntryListFieldValueList()
