@@ -367,6 +367,14 @@ class ARS(object):
                 # Extract the appropriate piece of data depending on its type
                 if data_type == arh.AR_DATA_TYPE_NULL:
                     entry_values[field_name] = None
+                elif data_type == arh.AR_DATA_TYPE_INTEGER:
+                    entry_values[field_name] = (
+                        values_list.fieldValueList[j].value.u.intVal
+                    )
+                elif data_type == arh.AR_DATA_TYPE_REAL:
+                    entry_values[field_name] = (
+                        values_list.fieldValueList[j].value.u.realVal
+                    )
                 elif data_type == arh.AR_DATA_TYPE_CHAR:
                     entry_values[field_name] = (
                         str(values_list.fieldValueList[j].value.u.charVal)
@@ -381,6 +389,20 @@ class ARS(object):
                     entry_values[field_name] = datetime.fromtimestamp(
                         values_list.fieldValueList[j].value.u.timeVal
                     )
+                elif data_type == arh.AR_DATA_TYPE_CURRENCY:
+                    # TODO: Implement support of the currency type
+                    # currency_struct = (
+                    #     values_list.fieldValueList[j].value.u.currencyVal.contents
+                    # )
+                    # <class 'pyremedy.arh.String'> (e.g. .00)
+                    # print('value:', currency_struct.value)
+                    # <type 'str'> (e.g. AUD)
+                    # print('currencyCode:', currency_struct.currencyCode)
+                    # <type 'int'> (epoch timestamp)
+                    # print('conversionDate:', currency_struct.conversionDate)
+                    # <class 'pyremedy.arh.struct_ARFuncCurrencyList'>
+                    # print('funcList:', currency_struct.funcList)
+                    pass
                 else:
                     self.arlib.FreeARQualifierStruct(
                         byref(qualifier), arh.FALSE
