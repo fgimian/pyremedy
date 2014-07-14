@@ -71,9 +71,9 @@ try:
     # Run a query to retrieve several entries from a schema
     entries = ars.query(
         schema='HPD:Help Desk',
-        qual="""'Status*' = "Assigned"
-                AND ('Assigned Group*+' = "My Team"
-                     OR 'Owner Group+' = "My Team")""",
+        qualifier="""'Status*' = "Assigned"
+                     AND ('Assigned Group*+' = "My Team"
+                          OR 'Owner Group+' = "My Team")""",
         fields=['Incident Number', 'Submit Date', 'Status', 'Description']
     )
 
