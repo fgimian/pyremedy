@@ -2,13 +2,12 @@ Essential improvements:
  ☐ Determine date timezone conversion
  ☐ Determine what's going on with the string type in arh.py
  ☐ Determine if we can test authentication against the user
- ☐ Implement the ability to get entries based on their id
+ ☐ Write unit tests for the library
 
 Additional features:
  ☐ Implement the ability to delete entries
  ☐ Deal with the currency data type if possible
  ☐ Implement multiple caching backends
  ☐ Implement query enums if possible
- ☐ Write unit tests for the library
  ☐ Support for Windows
  ☐ Python 3 compatibility
