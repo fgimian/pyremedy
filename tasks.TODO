@@ -5,7 +5,6 @@ Essential improvements:
  ☐ Write unit tests for the library
 
 Additional features:
- ☐ Implement the ability to delete entries
  ☐ Deal with the currency data type if possible
  ☐ Implement multiple caching backends
  ☐ Implement query enums if possible
