@@ -499,7 +499,6 @@ class ARValueList(Structure):
 
 # Entry retrieval limits
 # (ar.h line 841)
-
 # code to indicate should retrieve from result set starting with first entry
 AR_START_WITH_FIRST_ENTRY = 0
 # code to indicate no maximum limit for number of entries retrieved in list
@@ -662,11 +661,6 @@ class ARAndOrStruct(Structure):
     ]
 
 
-# For compatibility with strict ANSI C compilation modes, use the
-# "notQual" data member name rather than "not", and define AR_STRICT_ANSI
-# in your project  The words "and", "or", and "not" have become ANSI C
-# reserved keyword, and will eventually be phased out of the AR API.
-
 # (ar.h line 1189)
 class ARQualifierUnion(Union):
     _fields_ = [
@@ -731,7 +725,6 @@ class ARDiaryLimitsStruct(Structure):
 
 # Enum styles
 # (ar.h line 3845)
-
 # list auto-indexed starting at 0
 AR_ENUM_STYLE_REGULAR = 1
 # list indexed manually, gaps in numbers OK
@@ -933,7 +926,6 @@ class ARFieldLimitList(Structure):
 
 # Schema types
 # (ar.h line 5525)
-
 # get list of all schemas
 AR_LIST_SCHEMA_ALL = 0
 # get list of all regular schemas
@@ -957,7 +949,6 @@ AR_LIST_SCHEMA_ALLOWED_IN_MFSEARCH = 9
 
 # SetEntry options
 # (ar.h line 5555)
-
 # don't enforce join referential integrity
 AR_JOIN_SETOPTION_NONE = 0
 # enforce join referential integrity For internal API workflow
@@ -965,7 +956,6 @@ AR_JOIN_SETOPTION_REF = 1
 
 # DeleteEntry options
 # (ar.h line 5566)
-
 # individual entries will be deleted only when the entry can be retrieved
 # through the join schema
 AR_JOIN_DELOPTION_NONE = 0
