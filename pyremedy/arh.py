@@ -3,20 +3,14 @@ from ctypes import (
     Structure, Union, POINTER
 )
 
-# ----------------------------------------------------------------------------
-# artypes.h
-# ----------------------------------------------------------------------------
+# Data types (artypes.h).
 
-# TODO: Validate that these data types are correct across multiple OSs
 ARLong32 = c_int
 ARULong32 = c_uint
 ARUIntPtr = c_size_t
 
-# ----------------------------------------------------------------------------
-# ar.h
-# ----------------------------------------------------------------------------
+# General limits (ar.h line 67).
 
-# (ar.h line 67)
 # max actions for 1 filter/active link
 AR_MAX_ACTIONS = 25
 # max size of an active link message
@@ -73,7 +67,7 @@ AR_MAX_LICENSE_KEY_SIZE = 30
 AR_MAX_LOCALE_SIZE = 64
 # max size of a macro value
 AR_MAX_MACRO_VALUE = 255
-# max menu items in any single menu for   char field default sets
+# max menu items in any single menu for char field default sets
 AR_MAX_MENU_ITEMS = 199
 # max menu levels for char field default sets
 AR_MAX_MENU_LEVELS = 15
@@ -122,14 +116,16 @@ AR_MAX_USER_GUID_SIZE = 128
 # max size of wait continue label
 AR_MAX_WAIT_CONT_TITLE_SIZE = 64
 
-# filename limits; are restrictive so the names will be legal on any target
-# system and these limits are smallest
+# Filename Limits (ar.h line 126).
+# These are restrictive so the names will be legal on any target system and
+# these limits are smallest.
+
 AR_MAX_FILENAME_SIZE = 12
 AR_MAX_FILENAME_BASE = 8
 AR_MAX_FULL_FILENAME = 255
 
-# (ar.h line 180)
-# table and column field size limits
+# Table and column field size limits (ar.h line 180).
+
 # max data size displayed in a column
 AR_MAX_COLFLD_COLLENGTH = 255
 # max len of details in svr event form
@@ -143,19 +139,20 @@ AR_MAX_TBLFLD_NUMCOLS = 255
 # max rows returned in a refresh
 AR_MAX_TBLFLD_RETROWS = 9999
 
-# (ar.h line 235)
+# Decimal and currency limits (ar.h line 235).
+
 AR_MAX_DECIMAL_SIZE = 64
 AR_MAX_CURRENCY_CODE_SIZE = 3
 AR_MAX_CURRENCY_RATIO_SIZE = 64
 AR_CURRENT_CURRENCY_RATIOS = 0
 
-# Name for the system constants relating to the ARBoolean type
-# (ar.h line 249)
+# Name for the system constants relating to the ARBoolean type (ar.h line 249).
+
 FALSE = 0
 TRUE = 1
 
-# Codes for return values from API routines
-# (ar.h line 264)
+# Codes for return values from API routines (ar.h line 264).
+
 # successful; status may contain notes
 AR_RETURN_OK = 0
 # successful?; status contains details
@@ -173,7 +170,109 @@ AR_RETURN_ACCESSIBLE = 6
 # message type for ToolTips message action
 AR_RETURN_TOOLTIP = 7
 
-# (ar.h line 275)
+# Remedy data types (ar.h line 534).
+
+# code for a NULL value
+AR_DATA_TYPE_NULL = 0
+# code indicating a keyword setting
+AR_DATA_TYPE_KEYWORD = 1
+# codes for the data type of a value
+AR_DATA_TYPE_INTEGER = 2
+AR_DATA_TYPE_REAL = 3
+AR_DATA_TYPE_CHAR = 4
+AR_DATA_TYPE_DIARY = 5
+AR_DATA_TYPE_ENUM = 6
+AR_DATA_TYPE_TIME = 7
+AR_DATA_TYPE_BITMASK = 8
+AR_DATA_TYPE_BYTES = 9
+AR_DATA_TYPE_DECIMAL = 10
+AR_DATA_TYPE_ATTACH = 11
+AR_DATA_TYPE_CURRENCY = 12
+AR_DATA_TYPE_DATE = 13
+AR_DATA_TYPE_TIME_OF_DAY = 14
+
+# Field data types (ar.h line 568).
+
+# per record stored data field type
+AR_FIELD_TYPE_DATA = 1
+# visual trim field type
+AR_FIELD_TYPE_TRIM = 2
+# GUI control field type
+AR_FIELD_TYPE_CONTROL = 4
+# page field type
+AR_FIELD_TYPE_PAGE = 8
+# page holder field type
+AR_FIELD_TYPE_PAGE_HOLDER = 16
+# table field type
+AR_FIELD_TYPE_TABLE = 32
+# column field type
+AR_FIELD_TYPE_COLUMN = 64
+# attachment field type
+AR_FIELD_TYPE_ATTACH = 128
+# attachment pool type
+AR_FIELD_TYPE_ATTACH_POOL = 256
+
+# Entry retrieval limits (ar.h line 841).
+
+# code to indicate should retrieve from result set starting with first entry
+AR_START_WITH_FIRST_ENTRY = 0
+# code to indicate no maximum limit for number of entries retrieved in list
+AR_NO_MAX_LIST_RETRIEVE = 0
+# retrieve all entries even if there is a limit on the number of entries that
+# the server will return
+AR_RETRIEVE_ALL_ENTRIES = 999999999
+
+# Enum styles (ar.h line 3845).
+
+# list auto-indexed starting at 0
+AR_ENUM_STYLE_REGULAR = 1
+# list indexed manually, gaps in numbers OK
+AR_ENUM_STYLE_CUSTOM = 2
+# search performed to find name/number pairs
+AR_ENUM_STYLE_QUERY = 3
+
+# Schema types (ar.h line 5525).
+
+# get list of all schemas
+AR_LIST_SCHEMA_ALL = 0
+# get list of all regular schemas
+AR_LIST_SCHEMA_REGULAR = 1
+# get list of all join schemas
+AR_LIST_SCHEMA_JOIN = 2
+# get list of all view schemas
+AR_LIST_SCHEMA_VIEW = 3
+# get list of all schemas depending on given schema
+AR_LIST_SCHEMA_UPLINK = 4
+# get list of all schemas the given schema bases on
+AR_LIST_SCHEMA_DOWNLINK = 5
+# get list of all dialog schemas
+AR_LIST_SCHEMA_DIALOG = 6
+# get list of all schemas with database fields
+AR_LIST_SCHEMA_ALL_WITH_DATA = 7
+# get list of all vendor schemas
+AR_LIST_SCHEMA_VENDOR = 8
+# get list of all schemas allowed in multi-form searches
+AR_LIST_SCHEMA_ALLOWED_IN_MFSEARCH = 9
+
+# SetEntry options (ar.h line 5555).
+
+# don't enforce join referential integrity
+AR_JOIN_SETOPTION_NONE = 0
+# enforce join referential integrity For internal API workflow
+AR_JOIN_SETOPTION_REF = 1
+
+# DeleteEntry options (ar.h line 5566).
+
+# individual entries will be deleted only when the entry can be retrieved
+# through the join schema
+AR_JOIN_DELOPTION_NONE = 0
+# delete individual entries even when the entry cannot be retrieved from the
+# join schema. Error will be ignored for those entry pieces that are no longer
+# existing.
+AR_JOIN_DELOPTION_FORCE = 1
+
+# Type definitions (ar.h line 275).
+
 # boolean flag set to TRUE or FALSE
 ARBoolean = c_ubyte
 # structure to hold an entry id value
@@ -213,36 +312,32 @@ ARTime = ARLong32
 ARCurrencyCodeType = c_char * (AR_MAX_CURRENCY_CODE_SIZE + 1)
 
 
-# (ar.h line 354)
-# list of 0 or more object names
 class ARNameList(Structure):
+    """List of 0 or more object names (ar.h line 354)."""
     _fields_ = [
         ('numItems', c_uint),
         ('nameList', POINTER(ARNameType))
     ]
 
 
-# (ar.h line 330)
-# list of 0 or more internal ids
 class ARInternalIdList(Structure):
+    """List of 0 or more internal ids (ar.h line 330)."""
     _fields_ = [
         ('numItems', c_uint),
         ('internalIdList', POINTER(ARInternalId))
     ]
 
 
-# (ar.h line 322)
-# list of 0 or more entry ids
 class AREntryIdList(Structure):
+    """List of 0 or more entry ids (ar.h line 322)."""
     _fields_ = [
         ('numItems', c_uint),
         ('entryIdList', POINTER(AREntryIdType))
     ]
 
 
-# (ar.h line 447)
-# byte stream
 class ARByteList(Structure):
+    """Byte stream (ar.h line 447)."""
     _fields_ = [
         # type of list
         ('type', ARULong32),
@@ -254,8 +349,8 @@ class ARByteList(Structure):
     ]
 
 
-# (ar.h line 456)
 class ARLocalizationInfo(Structure):
+    """Localisation information (ar.h line 456)."""
     _fields_ = [
         ('locale', c_char * (AR_MAX_LOCALE_SIZE + 1)),
         ('charSet', c_char * (AR_MAX_LANG_SIZE + 1)),
@@ -266,15 +361,17 @@ class ARLocalizationInfo(Structure):
     ]
 
 
-# (ar.h line 467)
-# Control record containing information about the user and the environment.
-# An instance of this structure will be the first parameter of all the calls
-# supported by the AR system.
-#  NOTE that server is listed last in the structure below as it is not passed
-#     in the RPC call.  It is not needed on the server (who already knows
-#     who he is).  By placing it last, there can still be a "clean" mapping
-#     of the first part of the record with the RPC structure.
 class ARControlStruct(Structure):
+    """Control record containing information about the user and the
+    environment (ar.h line 467).  An instance of this structure will be the
+    first parameter of all the calls supported by the AR system.
+
+    .. note:: Server is listed last in the structure below as it is not passed
+       in the RPC call.  It is not needed on the server (who already knows
+       who he is).  By placing it last, there can still be a "clean" mapping
+       of the first part of the record with the RPC structure.
+    """
+
     _fields_ = [
         # id assigned and used by the system for efficient cache access
         ('cacheId', ARLong32),
@@ -294,9 +391,8 @@ class ARControlStruct(Structure):
     ]
 
 
-# (ar.h line 498)
-# type of error (see return values)
 class ARStatusStruct(Structure):
+    """Type of error (ar.h line 498)."""
     _fields_ = [
         ('messageType', c_uint),
         ('messageNum', ARLong32),
@@ -305,88 +401,40 @@ class ARStatusStruct(Structure):
     ]
 
 
-# (ar.h line 508)
-# list of 0 or more status messages
 class ARStatusList(Structure):
+    """List of 0 or more status messages (ar.h line 508)."""
     _fields_ = [
         ('numItems', c_uint),
         ('statusList', POINTER(ARStatusStruct))
     ]
 
 
-# Remedy data types
-# (ar.h line 534)
-# code for a NULL value
-AR_DATA_TYPE_NULL = 0
-# code indicating a keyword setting
-AR_DATA_TYPE_KEYWORD = 1
-# codes for the data type of a value
-AR_DATA_TYPE_INTEGER = 2
-AR_DATA_TYPE_REAL = 3
-AR_DATA_TYPE_CHAR = 4
-AR_DATA_TYPE_DIARY = 5
-AR_DATA_TYPE_ENUM = 6
-AR_DATA_TYPE_TIME = 7
-AR_DATA_TYPE_BITMASK = 8
-AR_DATA_TYPE_BYTES = 9
-AR_DATA_TYPE_DECIMAL = 10
-AR_DATA_TYPE_ATTACH = 11
-AR_DATA_TYPE_CURRENCY = 12
-AR_DATA_TYPE_DATE = 13
-AR_DATA_TYPE_TIME_OF_DAY = 14
-
-# Field data types
-# (ar.h line 568)
-# per record stored data field type
-AR_FIELD_TYPE_DATA = 1
-# visual trim field type
-AR_FIELD_TYPE_TRIM = 2
-# GUI control field type
-AR_FIELD_TYPE_CONTROL = 4
-# page field type
-AR_FIELD_TYPE_PAGE = 8
-# page holder field type
-AR_FIELD_TYPE_PAGE_HOLDER = 16
-# table field type
-AR_FIELD_TYPE_TABLE = 32
-# column field type
-AR_FIELD_TYPE_COLUMN = 64
-# attachment field type
-AR_FIELD_TYPE_ATTACH = 128
-# attachment pool type
-AR_FIELD_TYPE_ATTACH_POOL = 256
-
-
-# (ar.h line 694)
-# in typographic points (i.e., pixels)
 class ARCoordStruct(Structure):
+    """Co-ordinates in typographic points (i.e. pixels) (ar.h line 694)."""
     _fields_ = [
         ('x', ARLong32),
         ('y', ARLong32)
     ]
 
 
-# (ar.h line 701)
-# ordered list of 0 or more coordinates
 class ARCoordList(Structure):
+    """Ordered list of 0 or more coordinates (ar.h line 701)."""
     _fields_ = [
         ('numItems', c_uint),
         ('coords', POINTER(ARCoordStruct))
     ]
 
 
-# (ar.h line 714)
-# A generic buffer
 class ARBufStruct(Structure):
+    """A generic buffer (ar.h line 714)."""
     _fields_ = [
         ('bufSize', ARULong32),
         ('buffer', POINTER(c_ubyte)),
     ]
 
 
-# (ar.h line 722)
-# how to locate attachment
 class ARLocUnion(Union):
+    """Union relating to locating an attachment (ar.h line 722)."""
     _fields_ = [
         # filename to open
         ('filename', c_char_p),
@@ -396,6 +444,7 @@ class ARLocUnion(Union):
 
 
 class ARLocStruct(Structure):
+    """Struct relating to locating an attachment (ar.h line 722)."""
     _fields_ = [
         # AR_LOC_FILENAME | AR_LOC_BUFFER
         ('locType', ARULong32),
@@ -403,8 +452,8 @@ class ARLocStruct(Structure):
     ]
 
 
-# (ar.h line 734)
 class ARAttachStruct(Structure):
+    """An attachment (ar.h line 734)."""
     _fields_ = [
         # name of attachment
         ('name', c_char_p),
@@ -418,6 +467,7 @@ class ARAttachStruct(Structure):
 
 
 class ARFuncCurrencyStruct(Structure):
+    """(ar.h line 744)"""
     _fields_ = [
         # numeric currency value
         ('value', c_char_p),
@@ -426,16 +476,16 @@ class ARFuncCurrencyStruct(Structure):
     ]
 
 
-# (ar.h line 752)
 class ARFuncCurrencyList(Structure):
+    """(ar.h line 752)"""
     _fields_ = [
         ('numItems', c_uint),
         ('funcCurrencyList', POINTER(ARFuncCurrencyStruct))
     ]
 
 
-# (ar.h line 760)
 class ARCurrencyStruct(Structure):
+    """(ar.h line 760)"""
     _fields_ = [
         # numeric value of currency
         ('value', c_char_p),
@@ -448,14 +498,12 @@ class ARCurrencyStruct(Structure):
     ]
 
 
-# (ar.h line 777)
-# Structure used to hold a value.  There is one branch for each
-# datatype/property that is supported by the system.
 class ARValueUnion(Union):
+    """Union used to hold a value (ar.h line 777)."""
+
     _fields_ = [
         # noval_ is big enough to initialize both integer and pointer
-        # union members in declarations like
-        #   ARValueStruct val = { 0, {0}}
+        # union members in declarations like ARValueStruct val = { 0, {0}}
         ('noval_', c_size_t),
         ('keyNum', c_uint),
         ('intVal', ARLong32),
@@ -482,6 +530,10 @@ class ARValueUnion(Union):
 
 
 class ARValueStruct(Structure):
+    """Structure used to hold a value (ar.h line 777).  There is one branch
+    for each datatype/property that is supported by the system.
+    """
+
     _fields_ = [
         # AR_DATA_TYPE_xxx
         ('dataType', c_uint),
@@ -489,28 +541,16 @@ class ARValueStruct(Structure):
     ]
 
 
-# (ar.h line 817)
 class ARValueList(Structure):
+    """List of values (ar.h line 817)."""
     _fields_ = [
         ('numItems', c_uint),
         ('valueList', POINTER(ARValueStruct))
     ]
 
 
-# Entry retrieval limits
-# (ar.h line 841)
-# code to indicate should retrieve from result set starting with first entry
-AR_START_WITH_FIRST_ENTRY = 0
-# code to indicate no maximum limit for number of entries retrieved in list
-AR_NO_MAX_LIST_RETRIEVE = 0
-# retrieve all entries even if there is a limit on the number of entries that
-# the server will return
-AR_RETRIEVE_ALL_ENTRIES = 999999999
-
-
-# (ar.h line 850)
-# definition for a field in the entry list
 class AREntryListFieldStruct(Structure):
+    """Definition for a field in the entry list (ar.h line 850)."""
     _fields_ = [
         ('fieldId', ARInternalId),
         ('columnWidth', c_uint),
@@ -518,64 +558,59 @@ class AREntryListFieldStruct(Structure):
     ]
 
 
-# (ar.h line 858)
-# list of 0 or more fields in entrylist
 class AREntryListFieldList(Structure):
+    """List of 0 or more fields in entrylist (ar.h line 858)."""
     _fields_ = [
         ('numItems', c_uint),
         ('fieldsList', POINTER(AREntryListFieldStruct))
     ]
 
 
-# (ar.h line 917)
-# id and value for a single field
 class ARFieldValueStruct(Structure):
+    """An id and value for a single field (ar.h line 917)."""
     _fields_ = [
         ('fieldId', ARInternalId),
         ('value', ARValueStruct)
     ]
 
 
-# (ar.h line 925)
-# list of 0 or more field/value pairs
 class ARFieldValueList(Structure):
+    """List of 0 or more field/value pairs (ar.h line 925)."""
     _fields_ = [
         ('numItems', c_uint),
         ('fieldValueList', POINTER(ARFieldValueStruct))
     ]
 
 
-# (ar.h line 933)
-# parallel entry list structures which are
-# used to return entryList as a list of
-# entryId and entry as field/value pairs
 class AREntryListFieldValueStruct(Structure):
+    """Parallel entry list structures which are used to return entryList as a
+    list of entryId and entry as field/value pairs (ar.h line 933).
+    """
+
     _fields_ = [
         ('entryId', AREntryIdList),
         ('entryValues', POINTER(ARFieldValueList))
     ]
 
 
-# (ar.h line 944)
-# list of 0 or more entries
 class AREntryListFieldValueList(Structure):
+    """List of 0 or more entries (ar.h line 944)."""
     _fields_ = [
         ('numItems', c_uint),
         ('entryList', POINTER(AREntryListFieldValueStruct))
     ]
 
 
-# (ar.h line 982)
-# List of 0 or more ARBoolean
 class ARBooleanList(Structure):
+    """List of 0 or more ARBoolean (ar.h line 982)."""
     _fields_ = [
         ('numItems', c_uint),
         ('booleanList', POINTER(ARBoolean))
     ]
 
 
-# (ar.h line 1036)
 class ARStatHistoryValue(Structure):
+    """(ar.h line 1036)"""
     _fields_ = [
         ('enumVal', ARULong32),
         ('userOrTime', c_uint)
@@ -583,6 +618,7 @@ class ARStatHistoryValue(Structure):
 
 
 class ARCurrencyPartStruct(Structure):
+    """(ar.h line 1067)"""
     _fields_ = [
         ('fieldId', ARInternalId),
         ('partTag', c_uint),
@@ -590,13 +626,13 @@ class ARCurrencyPartStruct(Structure):
     ]
 
 
-# Forward definition of ARQualifierStruct
 class ARQualifierStruct(Structure):
+    """(ar.h line 1029 and 1189)"""
     pass
 
 
-# (ar.h line 1049)
 class ARQueryValueStruct(Structure):
+    """(ar.h line 1049)"""
     _fields_ = [
         ('schema', ARNameType),
         ('server', c_char * (AR_MAX_SERVER_SIZE + 1)),
@@ -606,13 +642,13 @@ class ARQueryValueStruct(Structure):
     ]
 
 
-# Forward definition of ARArithOpStruct
 class ARArithOpStruct(Structure):
+    """(ar.h line 1146)"""
     pass
 
 
-# (ar.h line 1116)
 class ARFieldValueOrArithUnion(Union):
+    """(ar.h line 1116)"""
     _fields_ = [
         # noval_ is big enough to initialize both integer and pointer
         # union members in declarations like
@@ -630,13 +666,13 @@ class ARFieldValueOrArithUnion(Union):
 
 
 class ARFieldValueOrArithStruct(Structure):
+    """(ar.h line 1116)"""
     _fields_ = [
         ('tag', c_uint),
         ('u', ARFieldValueOrArithUnion)
     ]
 
 
-# (ar.h line 1146)
 ARArithOpStruct._fields_ = [
     ('operation', c_uint),
     ('operandLeft', ARFieldValueOrArithStruct),
@@ -644,8 +680,8 @@ ARArithOpStruct._fields_ = [
 ]
 
 
-# (ar.h line 1164)
 class ARRelOpStruct(Structure):
+    """(ar.h line 1164)"""
     _fields_ = [
         ('operation', c_uint),
         ('operandLeft', ARFieldValueOrArithStruct),
@@ -653,16 +689,16 @@ class ARRelOpStruct(Structure):
     ]
 
 
-# (ar.h line 1179)
 class ARAndOrStruct(Structure):
+    """(ar.h line 1179)"""
     _fields_ = [
         ('operandLeft', POINTER(ARQualifierStruct)),
         ('operandRight', POINTER(ARQualifierStruct))
     ]
 
 
-# (ar.h line 1189)
 class ARQualifierUnion(Union):
+    """(ar.h line 1189)"""
     _fields_ = [
         ('andor', ARAndOrStruct),
         ('notQual', POINTER(ARQualifierStruct)),
@@ -671,23 +707,22 @@ class ARQualifierUnion(Union):
     ]
 
 
-# Now define the fields for ARQualifierStruct
 ARQualifierStruct._fields_ = [
     ('operation', c_uint),
     ('u', ARQualifierUnion)
 ]
 
 
-# (ar.h line 3780)
 class ARIntegerLimitsStruct(Structure):
+    """(ar.h line 3780)"""
     _fields_ = [
         ('rangeLow', ARLong32),
         ('rangeHigh', ARLong32)
     ]
 
 
-# (ar.h line 3789)
 class ARRealLimitsStruct(Structure):
+    """(ar.h line 3789)"""
     _fields_ = [
         ('rangeLow', c_double),
         ('rangeHigh', c_double),
@@ -695,8 +730,8 @@ class ARRealLimitsStruct(Structure):
     ]
 
 
-# (ar.h line 3820)
 class ARCharLimitsStruct(Structure):
+    """(ar.h line 3820)"""
     _fields_ = [
         ('maxLength', c_uint),
         # append or overwrite with new menu selections
@@ -716,41 +751,31 @@ class ARCharLimitsStruct(Structure):
     ]
 
 
-# (ar.h line 3839)
 class ARDiaryLimitsStruct(Structure):
+    """(ar.h line 3839)"""
     _fields_ = [
         ('fullTextOptions', c_uint)
     ]
 
 
-# Enum styles
-# (ar.h line 3845)
-# list auto-indexed starting at 0
-AR_ENUM_STYLE_REGULAR = 1
-# list indexed manually, gaps in numbers OK
-AR_ENUM_STYLE_CUSTOM = 2
-# search performed to find name/number pairs
-AR_ENUM_STYLE_QUERY = 3
-
-
-# (ar.h line 3849)
 class AREnumItemStruct(Structure):
+    """(ar.h line 3849)"""
     _fields_ = [
         ('itemName', ARNameType),
         ('itemNumber', ARULong32)
     ]
 
 
-# (ar.h line 3856)
 class AREnumItemList(Structure):
+    """(ar.h line 3856)"""
     _fields_ = [
         ('numItems', c_uint),
         ('enumItemList', POINTER(AREnumItemStruct))
     ]
 
 
-# (ar.h line 3863)
 class AREnumQueryStruct(Structure):
+    """(ar.h line 3863)"""
     _fields_ = [
         ('schema', ARNameType),
         ('server', c_char * (AR_MAX_SERVER_SIZE + 1)),
@@ -760,8 +785,8 @@ class AREnumQueryStruct(Structure):
     ]
 
 
-# (ar.h line 3873)
 class AREnumLimitsUnion(Union):
+    """(ar.h line 3873)"""
     _fields_ = [
         ('regularList', ARNameList),
         ('customList', AREnumItemList),
@@ -770,14 +795,15 @@ class AREnumLimitsUnion(Union):
 
 
 class AREnumLimitsStruct(Structure):
+    """(ar.h line 3873)"""
     _fields_ = [
         ('listStyle', c_uint),
         ('u', AREnumLimitsUnion)
     ]
 
 
-# (ar.h line 3888)
 class ARAttachLimitsStruct(Structure):
+    """(ar.h line 3888)"""
     _fields_ = [
         # 0 means unlimited
         ('maxSize', ARULong32),
@@ -786,8 +812,8 @@ class ARAttachLimitsStruct(Structure):
     ]
 
 
-# (ar.h line 3896)
 class ARTableLimitsStruct(Structure):
+    """(ar.h line 3896)"""
     _fields_ = [
         # number of columns in table field
         ('numColumns', c_uint),
@@ -804,8 +830,8 @@ class ARTableLimitsStruct(Structure):
     ]
 
 
-# (ar.h line 3921)
 class ARColumnLimitsStruct(Structure):
+    """(ar.h line 3921)"""
     _fields_ = [
         # parent field column field belongs to
         ('parent', ARInternalId),
@@ -818,8 +844,8 @@ class ARColumnLimitsStruct(Structure):
     ]
 
 
-# (ar.h line 3933)
 class ARDecimalLimitsStruct(Structure):
+    """(ar.h line 3933)"""
     _fields_ = [
         ('rangeLow', c_char_p),
         ('rangeHigh', c_char_p),
@@ -828,16 +854,16 @@ class ARDecimalLimitsStruct(Structure):
     ]
 
 
-# (ar.h line 3941)
 class ARViewLimits(Structure):
+    """(ar.h line 3941)"""
     _fields_ = [
         # 0 means unlimited length
         ('maxLength', c_uint)
     ]
 
 
-# (ar.h line 3947)
 class ARDisplayLimits(Structure):
+    """(ar.h line 3947)"""
     _fields_ = [
         # 0 means unlimited length
         ('maxLength', c_uint),
@@ -846,8 +872,8 @@ class ARDisplayLimits(Structure):
     ]
 
 
-# (ar.h line 3953)
 class ARDateLimitsStruct(Structure):
+    """(ar.h line 3953)"""
     _fields_ = [
         # minimum date value, in julian days
         ('minDate', c_int),
@@ -856,8 +882,8 @@ class ARDateLimitsStruct(Structure):
     ]
 
 
-# (ar.h line 3963)
 class ARCurrencyDetailStruct(Structure):
+    """(ar.h line 3963)"""
     _fields_ = [
         # currency type
         ('currencyCode', ARCurrencyCodeType),
@@ -866,16 +892,16 @@ class ARCurrencyDetailStruct(Structure):
     ]
 
 
-# (ar.h line 3971)
 class ARCurrencyDetailList(Structure):
+    """(ar.h line 3971)"""
     _fields_ = [
         ('numItems', c_uint),
         ('currencyDetailList', POINTER(ARCurrencyDetailStruct))
     ]
 
 
-# (ar.h line 3978)
 class ARCurrencyLimitsStruct(Structure):
+    """(ar.h line 3978)"""
     _fields_ = [
         ('rangeLow', c_char_p),
         ('rangeHigh', c_char_p),
@@ -886,8 +912,8 @@ class ARCurrencyLimitsStruct(Structure):
     ]
 
 
-# (ar.h line 3991)
 class ARFieldLimitUnion(Union):
+    """(ar.h line 3991)"""
     _fields_ = [
         ('intLimits', ARIntegerLimitsStruct),
         ('realLimits', ARRealLimitsStruct),
@@ -909,57 +935,16 @@ class ARFieldLimitUnion(Union):
 
 
 class ARFieldLimitStruct(Structure):
+    """(ar.h line 3991)"""
     _fields_ = [
         ('dataType', c_uint),
         ('u', ARFieldLimitUnion)
     ]
 
 
-# (ar.h line 4015)
-# list of 0 or more FieldLimitStructs
 class ARFieldLimitList(Structure):
+    """List of 0 or more FieldLimitStructs (ar.h line 4015)."""
     _fields_ = [
         ('numItems', c_uint),
         ('fieldLimitList', POINTER(ARFieldLimitStruct))
     ]
-
-
-# Schema types
-# (ar.h line 5525)
-# get list of all schemas
-AR_LIST_SCHEMA_ALL = 0
-# get list of all regular schemas
-AR_LIST_SCHEMA_REGULAR = 1
-# get list of all join schemas
-AR_LIST_SCHEMA_JOIN = 2
-# get list of all view schemas
-AR_LIST_SCHEMA_VIEW = 3
-# get list of all schemas depending on given schema
-AR_LIST_SCHEMA_UPLINK = 4
-# get list of all schemas the given schema bases on
-AR_LIST_SCHEMA_DOWNLINK = 5
-# get list of all dialog schemas
-AR_LIST_SCHEMA_DIALOG = 6
-# get list of all schemas with database fields
-AR_LIST_SCHEMA_ALL_WITH_DATA = 7
-# get list of all vendor schemas
-AR_LIST_SCHEMA_VENDOR = 8
-# get list of all schemas allowed in multi-form searches
-AR_LIST_SCHEMA_ALLOWED_IN_MFSEARCH = 9
-
-# SetEntry options
-# (ar.h line 5555)
-# don't enforce join referential integrity
-AR_JOIN_SETOPTION_NONE = 0
-# enforce join referential integrity For internal API workflow
-AR_JOIN_SETOPTION_REF = 1
-
-# DeleteEntry options
-# (ar.h line 5566)
-# individual entries will be deleted only when the entry can be retrieved
-# through the join schema
-AR_JOIN_DELOPTION_NONE = 0
-# delete individual entries even when the entry cannot be retrieved from the
-# join schema. Error will be ignored for those entry pieces that are no longer
-# existing.
-AR_JOIN_DELOPTION_FORCE = 1

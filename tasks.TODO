@@ -2,6 +2,7 @@ Essential improvements:
  ☐ Determine date timezone conversion
  ☐ Determine if we can test authentication against the user
  ☐ General cleanups to the arh.py file
+ ☐ Validate that data types are valid across architectures
 
 Additional features:
  ☐ Deal with the currency data type if possible
