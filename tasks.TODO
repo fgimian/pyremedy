@@ -3,11 +3,10 @@ Essential improvements:
  ☐ Determine if we can test authentication against the user
  ☐ General cleanups to the arh.py file
  ☐ Determine why FreeARFieldValueList crashes when create fails
- ☐ Validate that arh.py is compatible with all Remedy 8.x releases
- ☐ Write unit tests for the library
 
 Additional features:
  ☐ Deal with the currency data type if possible
  ☐ Implement multiple caching backends
  ☐ Implement query enums if possible
  ☐ Support for Windows
+ ☐ Write unit tests for the library
