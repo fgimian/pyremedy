@@ -421,7 +421,7 @@ class ARS(object):
             field_list.fieldsList[i].columnWidth = 1
             # From the C API Reference document (Chapter 3 / Entries)
             # For ARGetListEntryWithFields, set this value to one blank space.
-            field_list.fieldsList[i].separator = ' '
+            field_list.fieldsList[i].separator = b' '
 
         num_matches = c_uint()
         entry_list = arh.AREntryListFieldValueList()
