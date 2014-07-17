@@ -567,10 +567,9 @@ class ARS(object):
             ) >= arh.AR_RETURN_ERROR
         ):
             self._update_errors()
-            # TODO: Determine why this crashes
-            # self.arlib.FreeARFieldValueList(
-            #     byref(field_value_list, arh.FALSE)
-            # )
+            self.arlib.FreeARFieldValueList(
+                byref(field_value_list), arh.FALSE
+            )
             self.arlib.FreeARStatusList(byref(self.status), arh.FALSE)
             raise ARSError(
                 'Unable to create a new entry for schema {}'.format(schema)
@@ -657,7 +656,7 @@ class ARS(object):
         ):
             self._update_errors()
             self.arlib.FreeAREntryIdList(byref(entry_id_list), arh.FALSE)
-            self.arlib.FreeARFieldValueList(byref(field_value_list, arh.FALSE))
+            self.arlib.FreeARFieldValueList(byref(field_value_list), arh.FALSE)
             self.arlib.FreeARStatusList(byref(self.status), arh.FALSE)
             raise ARSError(
                 'Unable to modify entry id {} for schema {}'.format(
