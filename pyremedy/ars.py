@@ -8,7 +8,7 @@ from datetime import datetime
 import platform
 
 from . import arh
-from .exceptions import ARSError
+from .exceptions import ARSError, ARSDataTypeError
 
 
 class ARS(object):
@@ -291,37 +291,12 @@ class ARS(object):
         for i in range(field_value_list.numItems):
             field_id = field_value_list.fieldValueList[i].fieldId
             field_name = self.field_id_to_name_cache[schema][field_id]
-            data_type = field_value_list.fieldValueList[i].value.dataType
-
-            # Extract the appropriate piece of data depending on its type
-            if data_type == arh.AR_DATA_TYPE_NULL:
-                entry_values[field_name] = None
-            elif data_type == arh.AR_DATA_TYPE_INTEGER:
-                entry_values[field_name] = (
-                    field_value_list.fieldValueList[i].value.u.intVal
+            value_struct = field_value_list.fieldValueList[i].value
+            try:
+                entry_values[field_name] = self._extract_field(
+                    schema, field_id, value_struct
                 )
-            elif data_type == arh.AR_DATA_TYPE_REAL:
-                entry_values[field_name] = (
-                    field_value_list.fieldValueList[i].value.u.realVal
-                )
-            elif data_type == arh.AR_DATA_TYPE_CHAR:
-                entry_values[field_name] = (
-                    str(field_value_list.fieldValueList[i].value.u.charVal)
-                )
-            elif data_type == arh.AR_DATA_TYPE_ENUM:
-                entry_values[field_name] = (
-                    self.enum_id_to_name_cache[schema][field_id][
-                        field_value_list.fieldValueList[i].value.u.enumVal
-                    ]
-                )
-            elif data_type == arh.AR_DATA_TYPE_TIME:
-                entry_values[field_name] = datetime.fromtimestamp(
-                    field_value_list.fieldValueList[i].value.u.timeVal
-                )
-            elif data_type == arh.AR_DATA_TYPE_CURRENCY:
-                # TODO: Implement support of the currency type
-                pass
-            else:
+            except ARSDataTypeError:
                 self.arlib.FreeAREntryIdList(byref(entry_id_list), arh.FALSE)
                 self.arlib.FreeARInternalIdList(
                     byref(internal_id_list), arh.FALSE
@@ -330,10 +305,7 @@ class ARS(object):
                     byref(field_value_list), arh.FALSE
                 )
                 self.arlib.FreeARStatusList(byref(self.status), arh.FALSE)
-                raise ARSError(
-                    'An unknown data type was encountered for field name '
-                    '{} on schema {}'.format(field_name, schema)
-                )
+                raise
 
         self.arlib.FreeAREntryIdList(byref(entry_id_list), arh.FALSE)
         self.arlib.FreeARInternalIdList(byref(internal_id_list), arh.FALSE)
@@ -500,53 +472,19 @@ class ARS(object):
             entry_values = {}
 
             # Grab the values list for the entry
-            values_list = entry_list.entryList[i].entryValues.contents
+            field_value_list = entry_list.entryList[i].entryValues.contents
 
-            for j in range(values_list.numItems):
-                field_id = values_list.fieldValueList[j].fieldId
+            for j in range(field_value_list.numItems):
+                field_id = field_value_list.fieldValueList[j].fieldId
                 field_name = self.field_id_to_name_cache[schema][field_id]
-                data_type = values_list.fieldValueList[j].value.dataType
+                value_struct = field_value_list.fieldValueList[j].value
 
                 # Extract the appropriate piece of data depending on its type
-                if data_type == arh.AR_DATA_TYPE_NULL:
-                    entry_values[field_name] = None
-                elif data_type == arh.AR_DATA_TYPE_INTEGER:
-                    entry_values[field_name] = (
-                        values_list.fieldValueList[j].value.u.intVal
+                try:
+                    entry_values[field_name] = self._extract_field(
+                        schema, field_id, value_struct
                     )
-                elif data_type == arh.AR_DATA_TYPE_REAL:
-                    entry_values[field_name] = (
-                        values_list.fieldValueList[j].value.u.realVal
-                    )
-                elif data_type == arh.AR_DATA_TYPE_CHAR:
-                    entry_values[field_name] = (
-                        str(values_list.fieldValueList[j].value.u.charVal)
-                    )
-                elif data_type == arh.AR_DATA_TYPE_ENUM:
-                    entry_values[field_name] = (
-                        self.enum_id_to_name_cache[schema][field_id][
-                            values_list.fieldValueList[j].value.u.enumVal
-                        ]
-                    )
-                elif data_type == arh.AR_DATA_TYPE_TIME:
-                    entry_values[field_name] = datetime.fromtimestamp(
-                        values_list.fieldValueList[j].value.u.timeVal
-                    )
-                elif data_type == arh.AR_DATA_TYPE_CURRENCY:
-                    # TODO: Implement support of the currency type
-                    # currency_struct = (
-                    #     values_list.fieldValueList[j].value.u.currencyVal.contents
-                    # )
-                    # <class 'pyremedy.arh.String'> (e.g. .00)
-                    # print('value:', currency_struct.value)
-                    # <type 'str'> (e.g. AUD)
-                    # print('currencyCode:', currency_struct.currencyCode)
-                    # <type 'int'> (epoch timestamp)
-                    # print('conversionDate:', currency_struct.conversionDate)
-                    # <class 'pyremedy.arh.struct_ARFuncCurrencyList'>
-                    # print('funcList:', currency_struct.funcList)
-                    pass
-                else:
+                except ARSDataTypeError:
                     self.arlib.FreeARQualifierStruct(
                         byref(qualifier_struct), arh.FALSE
                     )
@@ -557,10 +495,7 @@ class ARS(object):
                         byref(entry_list), arh.FALSE
                     )
                     self.arlib.FreeARStatusList(byref(self.status), arh.FALSE)
-                    raise ARSError(
-                        'An unknown data type was encountered for field name '
-                        '{} on schema {}'.format(field_name, schema)
-                    )
+                    raise
 
             entries.append((entry_id, entry_values))
 
@@ -608,35 +543,12 @@ class ARS(object):
 
         for i, (field_name, value) in enumerate(entry_values.items()):
             field_id = self.field_name_to_id_cache[schema][field_name]
-            data_type = self.field_id_to_type_cache[schema][field_id]
-
-            field_value_list.fieldValueList[i].fieldId = field_id
-            field_value_list.fieldValueList[i].value.dataType = data_type
-
-            if data_type == arh.AR_DATA_TYPE_NULL:
-                pass
-            elif data_type == arh.AR_DATA_TYPE_INTEGER:
-                field_value_list.fieldValueList[i].value.u.intVal = value
-            elif data_type == arh.AR_DATA_TYPE_REAL:
-                field_value_list.fieldValueList[i].value.u.realVal = value
-            elif data_type == arh.AR_DATA_TYPE_CHAR:
-                # Note that we must allocate a new block of memory using
-                # strdup or we end up with a nasty invalid pointer error
-                field_value_list.fieldValueList[i].value.u.charVal = (
-                    self.clib.strdup(value)
+            try:
+                self._update_field(
+                    schema, field_id, value, field_value_list.fieldValueList[i]
                 )
-            elif data_type == arh.AR_DATA_TYPE_ENUM:
-                enum_id = self.enum_name_to_id_cache[schema][field_id][value]
-                field_value_list.fieldValueList[i].value.u.enumVal = enum_id
-            elif data_type == arh.AR_DATA_TYPE_TIME:
-                field_value_list.fieldValueList[i].value.u.timeVal = (
-                    value.strftime('%s')
-                )
-            else:
-                raise ARSError(
-                    'An unknown data type was encountered for field name {} '
-                    'on schema {}'.format(field_name, schema)
-                )
+            except ARSDataTypeError:
+                raise
 
         if (
             self.arlib.ARCreateEntry(
@@ -717,35 +629,12 @@ class ARS(object):
 
         for i, (field_name, value) in enumerate(entry_values.items()):
             field_id = self.field_name_to_id_cache[schema][field_name]
-            data_type = self.field_id_to_type_cache[schema][field_id]
-
-            field_value_list.fieldValueList[i].fieldId = field_id
-            field_value_list.fieldValueList[i].value.dataType = data_type
-
-            if data_type == arh.AR_DATA_TYPE_NULL:
-                pass
-            elif data_type == arh.AR_DATA_TYPE_INTEGER:
-                field_value_list.fieldValueList[i].value.u.intVal = value
-            elif data_type == arh.AR_DATA_TYPE_REAL:
-                field_value_list.fieldValueList[i].value.u.realVal = value
-            elif data_type == arh.AR_DATA_TYPE_CHAR:
-                # Note that we must allocate a new block of memory using
-                # strdup or we end up with a nasty invalid pointer error
-                field_value_list.fieldValueList[i].value.u.charVal = (
-                    self.clib.strdup(value)
+            try:
+                self._update_field(
+                    schema, field_id, value, field_value_list.fieldValueList[i]
                 )
-            elif data_type == arh.AR_DATA_TYPE_ENUM:
-                enum_id = self.enum_name_to_id_cache[schema][field_id][value]
-                field_value_list.fieldValueList[i].value.u.enumVal = enum_id
-            elif data_type == arh.AR_DATA_TYPE_TIME:
-                field_value_list.fieldValueList[i].value.u.timeVal = (
-                    value.strftime('%s')
-                )
-            else:
-                raise ARSError(
-                    'An unknown data type was encountered for field name {} '
-                    'on schema {}'.format(field_name, schema)
-                )
+            except ARSDataTypeError:
+                raise
 
         if (
             self.arlib.ARSetEntry(
@@ -1054,9 +943,98 @@ class ARS(object):
         self.arlib.FreeARNameList(byref(field_name_list), arh.FALSE)
         self.arlib.FreeARStatusList(byref(self.status), arh.FALSE)
 
+    def _extract_field(self, schema, field_id, value_struct):
+        """Returns the appropriate value for the schema and field id requested
+        given a particular value structure.
+
+        :param schema: the schema name related to the field you're extract
+                       data for
+        :param field_id: the field id of the schema being retrieved
+        :param value_struct: the Remedy value structure containing the data
+        """
+        # Determine the data type of the value
+        data_type = value_struct.dataType
+
+        # Retrieve the field name from the cache
+        field_name = self.field_id_to_name_cache[schema][field_id]
+
+        # Based on the data type, retrieve and convert (if necessary) the
+        # appropriate value and return it to the caller
+        if data_type == arh.AR_DATA_TYPE_NULL:
+            return None
+        elif data_type == arh.AR_DATA_TYPE_INTEGER:
+            return value_struct.u.intVal
+        elif data_type == arh.AR_DATA_TYPE_REAL:
+            return value_struct.u.realVal
+        elif data_type == arh.AR_DATA_TYPE_CHAR:
+            return str(value_struct.u.charVal)
+        elif data_type == arh.AR_DATA_TYPE_ENUM:
+            return (
+                self.enum_id_to_name_cache[schema][field_id][value_struct.u.enumVal]
+            )
+        elif data_type == arh.AR_DATA_TYPE_TIME:
+            return datetime.fromtimestamp(value_struct.u.timeVal)
+        elif data_type == arh.AR_DATA_TYPE_CURRENCY:
+            # TODO: Implement support of the currency type
+            # currency_struct = value_struct.u.currencyVal.contents
+            # <class 'pyremedy.arh.String'> (e.g. .00)
+            # print('value:', currency_struct.value)
+            # <type 'str'> (e.g. AUD)
+            # print('currencyCode:', currency_struct.currencyCode)
+            # <type 'int'> (epoch timestamp)
+            # print('conversionDate:', currency_struct.conversionDate)
+            # <class 'pyremedy.arh.struct_ARFuncCurrencyList'>
+            # print('funcList:', currency_struct.funcList)
+            return None
+        else:
+            raise ARSDataTypeError(
+                'An unknown data type was encountered for field name '
+                '{} on schema {}'.format(field_name, schema)
+            )
+
+    def _update_field(self, schema, field_id, value, field_value_struct):
+        """Updates a provided ARFieldValueStruct item with the appropriate
+        field information based on the type of value provided.
+
+        :param schema: the schema name related to the field you're updating
+        :param field_id: the field id of the schema being updated
+        :param value: the value that is to be placed in the given field id
+        :param field_value_struct: a ARFieldValueStruct to update with the
+                                   given field id and value
+        """
+
+        # Determine the data type of the value
+        data_type = self.field_id_to_type_cache[schema][field_id]
+
+        # Retrieve the field name from the cache
+        field_name = self.field_id_to_name_cache[schema][field_id]
+
+        field_value_struct.fieldId = field_id
+        field_value_struct.value.dataType = data_type
+        if data_type == arh.AR_DATA_TYPE_NULL:
+            pass
+        elif data_type == arh.AR_DATA_TYPE_INTEGER:
+            field_value_struct.value.u.intVal = value
+        elif data_type == arh.AR_DATA_TYPE_REAL:
+            field_value_struct.value.u.realVal = value
+        elif data_type == arh.AR_DATA_TYPE_CHAR:
+            # Note that we must allocate a new block of memory using
+            # strdup or we end up with a nasty invalid pointer error
+            field_value_struct.value.u.charVal = self.clib.strdup(value)
+        elif data_type == arh.AR_DATA_TYPE_ENUM:
+            enum_id = self.enum_name_to_id_cache[schema][field_id][value]
+            field_value_struct.value.u.enumVal = enum_id
+        elif data_type == arh.AR_DATA_TYPE_TIME:
+            field_value_struct.value.u.timeVal = value.strftime('%s')
+        else:
+            raise ARSDataTypeError(
+                'An unknown data type was encountered for field name {} '
+                'on schema {}'.format(field_name, schema)
+            )
+
     def _update_errors(self):
         """Updates the errors attribute with any errors that occurred on the
-        last operation based on the status struct
+        last operation based on the status struct.
         """
 
         # Clear previous errors

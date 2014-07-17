@@ -2,7 +2,6 @@ Essential improvements:
  ☐ Determine date timezone conversion
  ☐ Determine if we can test authentication against the user
  ☐ General cleanups to the arh.py file
- ☐ General reduction of repitition in ars.py
  ☐ Determine why FreeARFieldValueList crashes when create fails
  ☐ Validate that arh.py is compatible with all Remedy 8.x releases
  ☐ Write unit tests for the library
