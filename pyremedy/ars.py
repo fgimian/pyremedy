@@ -8,7 +8,7 @@ from datetime import datetime
 import platform
 
 from . import arh
-from .exceptions import ARSError, ARSDataTypeError
+from .exceptions import ARSError
 
 
 class ARS(object):
@@ -147,7 +147,7 @@ class ARS(object):
         ):
             self._update_errors()
             self.arlib.FreeARStatusList(byref(self.status), arh.FALSE)
-            raise ARSError('Enable to terminate the server connection')
+            raise ARSError('Unable to terminate the server connection')
 
         self.arlib.FreeARStatusList(byref(self.status), arh.FALSE)
 
@@ -296,7 +296,7 @@ class ARS(object):
                 entry_values[field_name] = self._extract_field(
                     schema, field_id, value_struct
                 )
-            except ARSDataTypeError:
+            except ARSError:
                 self.arlib.FreeAREntryIdList(byref(entry_id_list), arh.FALSE)
                 self.arlib.FreeARInternalIdList(
                     byref(internal_id_list), arh.FALSE
@@ -484,7 +484,7 @@ class ARS(object):
                     entry_values[field_name] = self._extract_field(
                         schema, field_id, value_struct
                     )
-                except ARSDataTypeError:
+                except ARSError:
                     self.arlib.FreeARQualifierStruct(
                         byref(qualifier_struct), arh.FALSE
                     )
@@ -543,12 +543,9 @@ class ARS(object):
 
         for i, (field_name, value) in enumerate(entry_values.items()):
             field_id = self.field_name_to_id_cache[schema][field_name]
-            try:
-                self._update_field(
-                    schema, field_id, value, field_value_list.fieldValueList[i]
-                )
-            except ARSDataTypeError:
-                raise
+            self._update_field(
+                schema, field_id, value, field_value_list.fieldValueList[i]
+            )
 
         if (
             self.arlib.ARCreateEntry(
@@ -629,12 +626,9 @@ class ARS(object):
 
         for i, (field_name, value) in enumerate(entry_values.items()):
             field_id = self.field_name_to_id_cache[schema][field_name]
-            try:
-                self._update_field(
-                    schema, field_id, value, field_value_list.fieldValueList[i]
-                )
-            except ARSDataTypeError:
-                raise
+            self._update_field(
+                schema, field_id, value, field_value_list.fieldValueList[i]
+            )
 
         if (
             self.arlib.ARSetEntry(
@@ -987,7 +981,7 @@ class ARS(object):
             # print('funcList:', currency_struct.funcList)
             return None
         else:
-            raise ARSDataTypeError(
+            raise ARSError(
                 'An unknown data type was encountered for field name '
                 '{} on schema {}'.format(field_name, schema)
             )
@@ -1027,7 +1021,7 @@ class ARS(object):
         elif data_type == arh.AR_DATA_TYPE_TIME:
             field_value_struct.value.u.timeVal = value.strftime('%s')
         else:
-            raise ARSDataTypeError(
+            raise ARSError(
                 'An unknown data type was encountered for field name {} '
                 'on schema {}'.format(field_name, schema)
             )
