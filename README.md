@@ -53,13 +53,9 @@ This library was heavily influenced by the following:
 ## Quick Start ##
 
 ``` python
-import sys
-
-if sys.version_info < (3,):
-    from __future__ import print_function  # new print function for py2k only
+from __future__ import print_function
 
 from pyremedy import ARS, ARSError
-import six  # to ensure that this code sample is py2k and py3k compatible
 
 try:
     # Initialise a connection to the Remedy ARS server
@@ -79,11 +75,22 @@ try:
 
     # Display each of the entries
     for entry_id, entry_values in entries:
-        print('Entry ID: {}'.format(entry.id))
-        for field, value in six.iteritems(entry_values):
+        print('Entry ID: {}'.format(entry_id))
+        print('-' * 80)
+        for field, value in entry_values.items():
             print('{}: {}'.format(field, value))
+        print()
 except ARSError as e:
     print('ERROR: {}'.format(e))
+    for message_number, message_text, appended_text in ars.errors:
+        if appended_text:
+            print(
+                'Message {}: {} ({})'.format(
+                    message_number, message_text, appended_text
+                )
+            )
+        else:
+            print('Message {}: {}'.format(message_number, message_text))
 finally:
     ars.terminate()
 ```
