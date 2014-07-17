@@ -658,6 +658,7 @@ class ARS(object):
             ) >= arh.AR_RETURN_ERROR
         ):
             self._update_errors()
+            # TODO: Determine why this crashes
             # self.arlib.FreeARFieldValueList(
             #     byref(field_value_list, arh.FALSE)
             # )
