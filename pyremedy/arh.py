@@ -444,7 +444,7 @@ class ARLocUnion(Union):
 
 
 class ARLocStruct(Structure):
-    """Struct relating to locating an attachment (ar.h line 722)."""
+    """Structure relating to locating an attachment (ar.h line 722)."""
     _fields_ = [
         # AR_LOC_FILENAME | AR_LOC_BUFFER
         ('locType', ARULong32),
@@ -500,7 +500,6 @@ class ARCurrencyStruct(Structure):
 
 class ARValueUnion(Union):
     """Union used to hold a value (ar.h line 777)."""
-
     _fields_ = [
         # noval_ is big enough to initialize both integer and pointer
         # union members in declarations like ARValueStruct val = { 0, {0}}
@@ -610,7 +609,10 @@ class ARBooleanList(Structure):
 
 
 class ARStatHistoryValue(Structure):
-    """(ar.h line 1036)"""
+    """Special selection field that stores user and time stamp information for
+    each of the defined status values (ar.h line 1036).
+    """
+
     _fields_ = [
         ('enumVal', ARULong32),
         ('userOrTime', c_uint)
@@ -618,7 +620,10 @@ class ARStatHistoryValue(Structure):
 
 
 class ARCurrencyPartStruct(Structure):
-    """(ar.h line 1067)"""
+    """Part of a currency field that combine to represent a complete currency
+    value (ar.h line 1067).
+    """
+
     _fields_ = [
         ('fieldId', ARInternalId),
         ('partTag', c_uint),
@@ -627,7 +632,11 @@ class ARCurrencyPartStruct(Structure):
 
 
 class ARQualifierStruct(Structure):
-    """(ar.h line 1029 and 1189)"""
+    """Structure used to hold a qualification which entries to retrieve when
+    creating a query result list (ARGetListEntry) or computing entry statistics
+    (ARGetEntryStatistics) (ar.h line 1029 and 1189).
+    """
+
     pass
 
 
@@ -648,11 +657,14 @@ class ARArithOpStruct(Structure):
 
 
 class ARFieldValueOrArithUnion(Union):
-    """(ar.h line 1116)"""
+    """Union used to hold values to compare in a relational qualification
+    operation (ar.h line 1116).
+    """
+
     _fields_ = [
         # noval_ is big enough to initialize both integer and pointer
         # union members in declarations like
-        #   ARFieldValueOrArithStruct val = { 0, {0}};
+        # ARFieldValueOrArithStruct val = { 0, {0}};
         ('noval_', c_size_t),
         ('fieldId', ARInternalId),
         ('value', ARValueStruct),
@@ -666,7 +678,10 @@ class ARFieldValueOrArithUnion(Union):
 
 
 class ARFieldValueOrArithStruct(Structure):
-    """(ar.h line 1116)"""
+    """Structure used to hold values to compare in a relational qualification
+    operation (ar.h line 1116).
+    """
+
     _fields_ = [
         ('tag', c_uint),
         ('u', ARFieldValueOrArithUnion)
@@ -681,7 +696,7 @@ ARArithOpStruct._fields_ = [
 
 
 class ARRelOpStruct(Structure):
-    """(ar.h line 1164)"""
+    """Relational qualification operator (ar.h line 1164)."""
     _fields_ = [
         ('operation', c_uint),
         ('operandLeft', ARFieldValueOrArithStruct),
@@ -690,7 +705,7 @@ class ARRelOpStruct(Structure):
 
 
 class ARAndOrStruct(Structure):
-    """(ar.h line 1179)"""
+    """Logical qualification operator (ar.h line 1179)."""
     _fields_ = [
         ('operandLeft', POINTER(ARQualifierStruct)),
         ('operandRight', POINTER(ARQualifierStruct))
@@ -698,7 +713,7 @@ class ARAndOrStruct(Structure):
 
 
 class ARQualifierUnion(Union):
-    """(ar.h line 1189)"""
+    """Union used to hold a qualification (ar.h line 1189)."""
     _fields_ = [
         ('andor', ARAndOrStruct),
         ('notQual', POINTER(ARQualifierStruct)),
@@ -714,7 +729,7 @@ ARQualifierStruct._fields_ = [
 
 
 class ARIntegerLimitsStruct(Structure):
-    """(ar.h line 3780)"""
+    """Integer limits (ar.h line 3780)."""
     _fields_ = [
         ('rangeLow', ARLong32),
         ('rangeHigh', ARLong32)
@@ -722,7 +737,7 @@ class ARIntegerLimitsStruct(Structure):
 
 
 class ARRealLimitsStruct(Structure):
-    """(ar.h line 3789)"""
+    """Real number limits (ar.h line 3789)."""
     _fields_ = [
         ('rangeLow', c_double),
         ('rangeHigh', c_double),
@@ -731,7 +746,7 @@ class ARRealLimitsStruct(Structure):
 
 
 class ARCharLimitsStruct(Structure):
-    """(ar.h line 3820)"""
+    """Character limits (ar.h line 3820)."""
     _fields_ = [
         ('maxLength', c_uint),
         # append or overwrite with new menu selections
@@ -752,14 +767,14 @@ class ARCharLimitsStruct(Structure):
 
 
 class ARDiaryLimitsStruct(Structure):
-    """(ar.h line 3839)"""
+    """Diary limits (ar.h line 3839)."""
     _fields_ = [
         ('fullTextOptions', c_uint)
     ]
 
 
 class AREnumItemStruct(Structure):
-    """(ar.h line 3849)"""
+    """Custom enum item (ar.h line 3849)."""
     _fields_ = [
         ('itemName', ARNameType),
         ('itemNumber', ARULong32)
@@ -767,7 +782,7 @@ class AREnumItemStruct(Structure):
 
 
 class AREnumItemList(Structure):
-    """(ar.h line 3856)"""
+    """Custom enum limits (ar.h line 3856)."""
     _fields_ = [
         ('numItems', c_uint),
         ('enumItemList', POINTER(AREnumItemStruct))
@@ -775,7 +790,7 @@ class AREnumItemList(Structure):
 
 
 class AREnumQueryStruct(Structure):
-    """(ar.h line 3863)"""
+    """Query definition for query enum limits (ar.h line 3863)."""
     _fields_ = [
         ('schema', ARNameType),
         ('server', c_char * (AR_MAX_SERVER_SIZE + 1)),
@@ -786,7 +801,7 @@ class AREnumQueryStruct(Structure):
 
 
 class AREnumLimitsUnion(Union):
-    """(ar.h line 3873)"""
+    """Union used to hold enum limits (ar.h line 3873)."""
     _fields_ = [
         ('regularList', ARNameList),
         ('customList', AREnumItemList),
@@ -795,7 +810,7 @@ class AREnumLimitsUnion(Union):
 
 
 class AREnumLimitsStruct(Structure):
-    """(ar.h line 3873)"""
+    """Structure used to hold enum limits (ar.h line 3873)."""
     _fields_ = [
         ('listStyle', c_uint),
         ('u', AREnumLimitsUnion)
@@ -803,7 +818,7 @@ class AREnumLimitsStruct(Structure):
 
 
 class ARAttachLimitsStruct(Structure):
-    """(ar.h line 3888)"""
+    """Attachment limits (ar.h line 3888)."""
     _fields_ = [
         # 0 means unlimited
         ('maxSize', ARULong32),
@@ -813,7 +828,7 @@ class ARAttachLimitsStruct(Structure):
 
 
 class ARTableLimitsStruct(Structure):
-    """(ar.h line 3896)"""
+    """Table limits (ar.h line 3896)."""
     _fields_ = [
         # number of columns in table field
         ('numColumns', c_uint),
@@ -831,7 +846,7 @@ class ARTableLimitsStruct(Structure):
 
 
 class ARColumnLimitsStruct(Structure):
-    """(ar.h line 3921)"""
+    """Column limits (ar.h line 3921)."""
     _fields_ = [
         # parent field column field belongs to
         ('parent', ARInternalId),
@@ -845,7 +860,7 @@ class ARColumnLimitsStruct(Structure):
 
 
 class ARDecimalLimitsStruct(Structure):
-    """(ar.h line 3933)"""
+    """Decimal limits (ar.h line 3933)."""
     _fields_ = [
         ('rangeLow', c_char_p),
         ('rangeHigh', c_char_p),
@@ -855,7 +870,7 @@ class ARDecimalLimitsStruct(Structure):
 
 
 class ARViewLimits(Structure):
-    """(ar.h line 3941)"""
+    """View limits (ar.h line 3941)."""
     _fields_ = [
         # 0 means unlimited length
         ('maxLength', c_uint)
@@ -863,7 +878,7 @@ class ARViewLimits(Structure):
 
 
 class ARDisplayLimits(Structure):
-    """(ar.h line 3947)"""
+    """Display limits (ar.h line 3947)."""
     _fields_ = [
         # 0 means unlimited length
         ('maxLength', c_uint),
@@ -873,7 +888,7 @@ class ARDisplayLimits(Structure):
 
 
 class ARDateLimitsStruct(Structure):
-    """(ar.h line 3953)"""
+    """Date limits (ar.h line 3953)."""
     _fields_ = [
         # minimum date value, in julian days
         ('minDate', c_int),
@@ -883,7 +898,7 @@ class ARDateLimitsStruct(Structure):
 
 
 class ARCurrencyDetailStruct(Structure):
-    """(ar.h line 3963)"""
+    """Details of a currency limit (ar.h line 3963)."""
     _fields_ = [
         # currency type
         ('currencyCode', ARCurrencyCodeType),
@@ -893,7 +908,7 @@ class ARCurrencyDetailStruct(Structure):
 
 
 class ARCurrencyDetailList(Structure):
-    """(ar.h line 3971)"""
+    """List of currency limit details (ar.h line 3971)."""
     _fields_ = [
         ('numItems', c_uint),
         ('currencyDetailList', POINTER(ARCurrencyDetailStruct))
@@ -901,7 +916,7 @@ class ARCurrencyDetailList(Structure):
 
 
 class ARCurrencyLimitsStruct(Structure):
-    """(ar.h line 3978)"""
+    """Currency limits (ar.h line 3978)."""
     _fields_ = [
         ('rangeLow', c_char_p),
         ('rangeHigh', c_char_p),
@@ -913,7 +928,7 @@ class ARCurrencyLimitsStruct(Structure):
 
 
 class ARFieldLimitUnion(Union):
-    """(ar.h line 3991)"""
+    """Union used to hold field limits (ar.h line 3991)."""
     _fields_ = [
         ('intLimits', ARIntegerLimitsStruct),
         ('realLimits', ARRealLimitsStruct),
@@ -935,7 +950,7 @@ class ARFieldLimitUnion(Union):
 
 
 class ARFieldLimitStruct(Structure):
-    """(ar.h line 3991)"""
+    """Structure used to hold field limits (ar.h line 3991)."""
     _fields_ = [
         ('dataType', c_uint),
         ('u', ARFieldLimitUnion)
