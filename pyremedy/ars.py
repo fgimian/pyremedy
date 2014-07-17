@@ -622,7 +622,7 @@ class ARS(object):
             elif data_type == arh.AR_DATA_TYPE_CHAR:
                 # Note that we must allocate a new block of memory using
                 # strdup or we end up with a nasty invalid pointer error
-                field_value_list.fieldValueList[i].value.u.charVal.data = (
+                field_value_list.fieldValueList[i].value.u.charVal = (
                     self.clib.strdup(value)
                 )
             elif data_type == arh.AR_DATA_TYPE_ENUM:
@@ -730,7 +730,7 @@ class ARS(object):
             elif data_type == arh.AR_DATA_TYPE_CHAR:
                 # Note that we must allocate a new block of memory using
                 # strdup or we end up with a nasty invalid pointer error
-                field_value_list.fieldValueList[i].value.u.charVal.data = (
+                field_value_list.fieldValueList[i].value.u.charVal = (
                     self.clib.strdup(value)
                 )
             elif data_type == arh.AR_DATA_TYPE_ENUM:

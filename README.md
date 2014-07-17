@@ -90,7 +90,9 @@ finally:
 
 ## Development Notes ##
 
-### Generating arh.py (ctypes version of ar.h) ###
+### Generating arh.py (ctypes version of ar.h) for reference ###
+
+I now maintain my own hand-written version of ar.h converted to ctypes to ensure minimal bloat and maximum transparency.  However, it is useful to have a generated copy alongside for reference when adding any structs to this file.
 
 To generate this file, please follow the steps below:
 
@@ -100,10 +102,10 @@ To generate this file, please follow the steps below:
    pip install ctypesgen
    ```
 
-2. Generate arh.py using the ar.h C header file
+2. Generate arhgen.py using the ar.h C header file
 
    ``` bash
-   ctypesgen.py /opt/remedy/include/ar.h -o arh.py
+   ctypesgen.py /opt/remedy/include/ar.h -o arhgen.py
    ```
 
 ## Compatibility ##
