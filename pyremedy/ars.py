@@ -314,7 +314,10 @@ class ARS(object):
 
         return entry_values
 
-    def query(self, schema, qualifier, fields):
+    def query(
+        self, schema, qualifier, fields, offset=arh.AR_START_WITH_FIRST_ENTRY,
+        limit=arh.AR_NO_MAX_LIST_RETRIEVE
+    ):
         """Runs a specified qualification string against a chosen schema and
         returns the all related records with the fields specified by the
         caller.
@@ -322,6 +325,8 @@ class ARS(object):
         :param schema: the schema name to run the query against
         :param qualifier: the query determining which records to retrieve
         :param fields: a list of field names to retrieve from the schema
+        :param offset: the index of the first record to retrieve
+        :param limit: limit the number of returned results to a given number
         """
 
         # Ensure we have all field and enum details for the schema
@@ -414,10 +419,10 @@ class ARS(object):
                 # (NULL for default sort)
                 None,
                 # unsigned int firstRetrieve: the first record to retrieve
-                arh.AR_START_WITH_FIRST_ENTRY,
+                offset,
                 # unsigned int maxRetrieve: the maximum number of items to
                 # retrieve
-                arh.AR_NO_MAX_LIST_RETRIEVE,
+                limit,
                 # ARBoolean useLocale: whether to search based on locale
                 arh.FALSE,
 
