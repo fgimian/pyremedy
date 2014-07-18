@@ -6,9 +6,6 @@ Essential improvements:
    ☐ ARCurrencyStruct
    ☐ ARQueryValueStruct
    ☐ ARArithOpStruct
- ☐ Validate that data types are valid across architectures
-   ☐ ARLong32
-   ☐ ARULong32
 
 Additional features:
  ☐ Determine if we can test authentication against the user
