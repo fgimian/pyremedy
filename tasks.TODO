@@ -1,12 +1,19 @@
 Essential improvements:
  ☐ Determine date timezone conversion
- ☐ Determine if we can test authentication against the user
  ☐ General cleanups to the arh.py file
+   ☐ ARFuncCurrencyStruct
+   ☐ ARFuncCurrencyList
+   ☐ ARCurrencyStruct
+   ☐ ARQueryValueStruct
+   ☐ ARArithOpStruct
  ☐ Validate that data types are valid across architectures
+   ☐ ARLong32
+   ☐ ARULong32
 
 Additional features:
+ ☐ Determine if we can test authentication against the user
+ ☐ Write unit tests for the library
  ☐ Deal with the currency data type if possible
  ☐ Implement multiple caching backends
  ☐ Implement query enums if possible
  ☐ Support for Windows
- ☐ Write unit tests for the library

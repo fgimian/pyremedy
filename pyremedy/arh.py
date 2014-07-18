@@ -116,9 +116,8 @@ AR_MAX_USER_GUID_SIZE = 128
 # max size of wait continue label
 AR_MAX_WAIT_CONT_TITLE_SIZE = 64
 
-# Filename Limits (ar.h line 126).
-# These are restrictive so the names will be legal on any target system and
-# these limits are smallest.
+# Filename Limits (ar.h line 126). These are restrictive so the names will be
+# legal on any target system and these limits are smallest.
 
 AR_MAX_FILENAME_SIZE = 12
 AR_MAX_FILENAME_BASE = 8
@@ -410,7 +409,7 @@ class ARStatusList(Structure):
 
 
 class ARCoordStruct(Structure):
-    """Co-ordinates in typographic points (i.e. pixels) (ar.h line 694)."""
+    """Coordinates in typographic points (i.e. pixels) (ar.h line 694)."""
     _fields_ = [
         ('x', ARLong32),
         ('y', ARLong32)
