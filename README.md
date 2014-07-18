@@ -126,9 +126,8 @@ running 7.5 which PyRemedy has no trouble with at all using the 8.1.1 API.
 
 ### Operating System Support ###
 
-I'm proud to say that PyRemedy fully supports 64-bit Python running on Linux
-systems along with 32-bit Python.  Windows is not currently supported although
-support is planned.
+I'm proud to say that PyRemedy fully and exclusively supports 64-bit Python
+running on Linux systems.
 
 ### Python ###
 

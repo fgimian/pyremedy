@@ -5,7 +5,6 @@ from ctypes import (
     CDLL, sizeof, cast, byref, memset, c_char_p, c_uint, POINTER
 )
 from datetime import datetime
-import platform
 
 from . import arh
 from .exceptions import ARSError
@@ -27,15 +26,9 @@ class ARS(object):
     """
 
     def __init__(self, server, user, password, port=0, rpc_program_number=0):
-        # Determine the architecture of the user's system
-        bits, linkage = platform.architecture()
-
         #: The Remedy ARS C API shared object file which is used to interact
         #: with the Remedy server
-        if bits == '64bit':
-            self.arlib = CDLL('libar_lx64.so')
-        else:
-            self.arlib = CDLL('libar.so')
+        self.arlib = CDLL('libar_lx64.so')
 
         #: The standard C library used to run several lower-lever C functions
         self.clib = CDLL('libc.so.6')
