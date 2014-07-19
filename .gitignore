@@ -1,2 +1,5 @@
 # Python byte-compiled, optimized and DLL files
 *.py[cod]
+
+# Documentation builds
+docs/_build
