@@ -933,14 +933,6 @@ class ARS(object):
 
                 # Process query enums mappings
                 else:
-                    # TODO: Implement query enums if possible
-                    # query_list = field_enum_limits_list.u.queryList
-                    # print("schema: %s" % query_list.schema)
-                    # print("server: %s" % query_list.server)
-                    # qualifier: query_list.qualifier
-                    # print("nameField: %d" % query_list.nameField)
-                    # print("numberField: %d" % query_list.numberField)
-
                     self.arlib.FreeARInternalIdList(
                         byref(field_id_list), arh.FALSE
                     )
@@ -995,18 +987,6 @@ class ARS(object):
             )
         elif data_type == arh.AR_DATA_TYPE_TIME:
             return datetime.fromtimestamp(value_struct.u.timeVal)
-        elif data_type == arh.AR_DATA_TYPE_CURRENCY:
-            # TODO: Implement support of the currency type
-            # currency_struct = value_struct.u.currencyVal.contents
-            # <class 'pyremedy.arh.String'> (e.g. .00)
-            # print('value:', currency_struct.value)
-            # <type 'str'> (e.g. AUD)
-            # print('currencyCode:', currency_struct.currencyCode)
-            # <type 'int'> (epoch timestamp)
-            # print('conversionDate:', currency_struct.conversionDate)
-            # <class 'pyremedy.arh.struct_ARFuncCurrencyList'>
-            # print('funcList:', currency_struct.funcList)
-            return None
         else:
             raise ARSError(
                 'An unknown data type was encountered for field name '
