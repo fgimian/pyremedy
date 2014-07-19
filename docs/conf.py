@@ -33,7 +33,6 @@ sys.path.append(os.path.abspath('_themes'))
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
-    'sphinx.ext.todo',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
