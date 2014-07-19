@@ -1,5 +1,12 @@
 # Python byte-compiled, optimized and DLL files
 *.py[cod]
 
+# Distribution & packaging
+build/
+develop-eggs/
+dist/
+*.egg-info/
+*.egg
+
 # Documentation builds
 docs/_build
