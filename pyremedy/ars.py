@@ -147,6 +147,8 @@ class ARS(object):
     def schemas(self):
         """Retrieves a list of all available schemas on the specified Remedy
         ARS server
+
+        :return: a list of schema names
         """
 
         # Use the cache if possible
@@ -211,6 +213,8 @@ class ARS(object):
         :param schema: the schema name to retrieve the entry for
         :param entry_id: the entry id of the entry that you wish to retrieve
         :param fields: a list of field names to retrieve from the schema
+        :return: a dict containing the field names and values requested for
+                 the respective entry id
         """
 
         # Ensure we have all field and enum details for the schema
@@ -320,6 +324,9 @@ class ARS(object):
         :param fields: a list of field names to retrieve from the schema
         :param offset: the index of the first record to retrieve
         :param limit: limit the number of returned results to a given number
+        :return: a list of tuples containing the entries matching the criteria
+                 specified whereby each tuple contains the entry id and
+                 entry values
         """
 
         # Ensure we have all field and enum details for the schema
@@ -942,6 +949,7 @@ class ARS(object):
                        data for
         :param field_id: the field id of the schema being retrieved
         :param value_struct: the Remedy value structure containing the data
+        :return: the value of the field requested
         """
         # Determine the data type of the value
         data_type = value_struct.dataType
