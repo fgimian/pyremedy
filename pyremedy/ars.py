@@ -18,11 +18,12 @@ class ARS(object):
     The ARS object also provides a caching mechanism for schema lists and
     field mappings.
 
-    :param server: the Remedy ARS server to connect to
-    :param user: the username to authenticate with
-    :param password: the password to authenticate with
-    :param port: the port number of the server
-    :param rpc_program_number: the RPC program number of the server
+    :param str server: the Remedy ARS server to connect to
+    :param str user: the username to authenticate with
+    :param str password: the password to authenticate with
+    :param int port: the port number of the server
+    :param int rpc_program_number: the RPC program number of the server
+    :raises: ARSError
     """
 
     def __init__(self, server, user, password, port=0, rpc_program_number=0):
@@ -127,7 +128,11 @@ class ARS(object):
             self.arlib.FreeARStatusList(byref(self.status), arh.FALSE)
 
     def terminate(self):
-        """Perform a cleanup and disconnect the session"""
+        """Perform a cleanup and disconnect the session
+
+        :raises: ARSError
+        """
+
         if (
             self.arlib.ARTermination(
                 # ARControlStruct *control: the control record
@@ -149,6 +154,7 @@ class ARS(object):
         ARS server
 
         :return: a list of schema names
+        :raises: ARSError
         """
 
         # Use the cache if possible
@@ -200,7 +206,8 @@ class ARS(object):
     def fields(self, schema):
         """Returns a list of field names provided by a selected schema
 
-        :param schema: the schema name to retrieve field names for
+        :param str schema: the schema name to retrieve field names for
+        :raises: ARSError
         """
 
         self.update_fields(schema)
@@ -210,11 +217,13 @@ class ARS(object):
         """Retrieves a particular entry in the requested schema using the
         given entry id.
 
-        :param schema: the schema name to retrieve the entry for
-        :param entry_id: the entry id of the entry that you wish to retrieve
+        :param str schema: the schema name to retrieve the entry for
+        :param str entry_id: the entry id of the entry that you wish to retrieve
         :param fields: a list of field names to retrieve from the schema
+        :type fields: list of strings
         :return: a dict containing the field names and values requested for
                  the respective entry id
+        :raises: ARSError
         """
 
         # Ensure we have all field and enum details for the schema
@@ -319,14 +328,17 @@ class ARS(object):
         returns the all related records with the fields specified by the
         caller.
 
-        :param schema: the schema name to run the query against
-        :param qualifier: the query determining which records to retrieve
+        :param str schema: the schema name to run the query against
+        :param str qualifier: the query determining which records to retrieve
         :param fields: a list of field names to retrieve from the schema
-        :param offset: the index of the first record to retrieve
-        :param limit: limit the number of returned results to a given number
+        :type fields: list of strings
+        :param int offset: the index of the first record to retrieve
+        :param int limit: limit the number of returned results to a given
+                          number
         :return: a list of tuples containing the entries matching the criteria
                  specified whereby each tuple contains the entry id and
                  entry values
+        :raises: ARSError
         """
 
         # Ensure we have all field and enum details for the schema
@@ -515,10 +527,13 @@ class ARS(object):
         """Creates a new entry in a given schema using the provided entry
         values.
 
-        :param schema: the schema where the entry is to be created
+        :param str schema: the schema where the entry is to be created
         :param entry_values: a dict containing the field names and values
                              for the new entry
+        :type entry_values: dict of string to values corresponding to the type
+                            of the respective field
         :return: the entry id of the newly created entry
+        :raises: ARSError
         """
 
         # Ensure we have all field and enum details for the schema
@@ -590,10 +605,13 @@ class ARS(object):
         """Updates a chosen entry in a given schema using the provided
         entry values.
 
-        :param schema: the schema where the entry is located
-        :param entry_id: the entry id of the record to be updated
+        :param str schema: the schema where the entry is located
+        :param str entry_id: the entry id of the record to be updated
         :param entry_values: a dict containing the field names and values
                              to be updated
+        :type entry_values: dict of string to values corresponding to the type
+                            of the respective field
+        :raises: ARSError
         """
 
         # Ensure we have all field and enum details for the schema
@@ -677,8 +695,9 @@ class ARS(object):
         """Deletes a particular entry in the requested schema using the
         given entry id.
 
-        :param schema: the schema name to delete the entry from
-        :param entry_id: the entry id of the entry that you wish to delete
+        :param str schema: the schema name to delete the entry from
+        :param str entry_id: the entry id of the entry that you wish to delete
+        :raises: ARSError
         """
 
         entry_id_list = arh.AREntryIdList()
@@ -724,7 +743,8 @@ class ARS(object):
         then retrieves the related field names and enum mappings.  This method
         assumes that all field names are unique.
 
-        :param schema: the schema name to retrieve field information for
+        :param str schema: the schema name to retrieve field information for
+        :raises: ARSError
         """
 
         # Use the cache if possible
@@ -945,11 +965,13 @@ class ARS(object):
         """Returns the appropriate value for the schema and field id requested
         given a particular value structure.
 
-        :param schema: the schema name related to the field you're extract
-                       data for
-        :param field_id: the field id of the schema being retrieved
-        :param value_struct: the Remedy value structure containing the data
+        :param str schema: the schema name related to the field you're extract
+                           data for
+        :param str field_id: the field id of the schema being retrieved
+        :param ARValueStruct value_struct: the Remedy ARValueStruct containing
+                                           the data
         :return: the value of the field requested
+        :raises: ARSError
         """
         # Determine the data type of the value
         data_type = value_struct.dataType
@@ -995,11 +1017,14 @@ class ARS(object):
         """Updates a provided ARFieldValueStruct item with the appropriate
         field information based on the type of value provided.
 
-        :param schema: the schema name related to the field you're updating
-        :param field_id: the field id of the schema being updated
+        :param str schema: the schema name related to the field you're updating
+        :param str field_id: the field id of the schema being updated
         :param value: the value that is to be placed in the given field id
-        :param field_value_struct: a ARFieldValueStruct to update with the
-                                   given field id and value
+        :type value: a value corresponding to the type of the respective field
+        :param ARFieldValueStruct field_value_struct: a ARFieldValueStruct to
+                                                      update with the given
+                                                      field id and value
+        :raises: ARSError
         """
 
         # Determine the data type of the value
