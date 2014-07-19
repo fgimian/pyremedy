@@ -25,6 +25,9 @@ This library was heavily influenced by the following:
   The documentation provided by BMC is absolutely awesome and has been the main
   reference used during the development of PyRemedy.
 
+The awesome logo is provided courtesy of
+`Open Clip Art Library <http://openclipart.org/detail/192888/tux-nurse-1-by-merlin2525-192888>`_
+
 Installation
 ------------
 
@@ -155,9 +158,3 @@ API
 .. autoclass:: ARS
    :members: terminate, schemas, fields, get, query, create, update, delete,
              update_fields
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`search`
