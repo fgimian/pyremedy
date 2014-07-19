@@ -466,7 +466,7 @@ class ARAttachStruct(Structure):
 
 
 class ARFuncCurrencyStruct(Structure):
-    """(ar.h line 744)"""
+    """A functional currency (ar.h line 744)."""
     _fields_ = [
         # numeric currency value
         ('value', c_char_p),
@@ -476,7 +476,7 @@ class ARFuncCurrencyStruct(Structure):
 
 
 class ARFuncCurrencyList(Structure):
-    """(ar.h line 752)"""
+    """List of 0 or more functional currencies (ar.h line 752)."""
     _fields_ = [
         ('numItems', c_uint),
         ('funcCurrencyList', POINTER(ARFuncCurrencyStruct))
@@ -484,7 +484,7 @@ class ARFuncCurrencyList(Structure):
 
 
 class ARCurrencyStruct(Structure):
-    """(ar.h line 760)"""
+    """A currency value (ar.h line 760)."""
     _fields_ = [
         # numeric value of currency
         ('value', c_char_p),
@@ -640,7 +640,7 @@ class ARQualifierStruct(Structure):
 
 
 class ARQueryValueStruct(Structure):
-    """(ar.h line 1049)"""
+    """Query value used in relational qualifications (ar.h line 1049)."""
     _fields_ = [
         ('schema', ARNameType),
         ('server', c_char * (AR_MAX_SERVER_SIZE + 1)),
@@ -651,7 +651,7 @@ class ARQueryValueStruct(Structure):
 
 
 class ARArithOpStruct(Structure):
-    """(ar.h line 1146)"""
+    """Result value from an arithmetic operation (ar.h line 1146)."""
     pass
 
 
