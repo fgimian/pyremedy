@@ -1,11 +1,5 @@
 Essential improvements:
  ☐ Determine date timezone conversion
- ☐ General cleanups to the arh.py file
-   ☐ ARFuncCurrencyStruct
-   ☐ ARFuncCurrencyList
-   ☐ ARCurrencyStruct
-   ☐ ARQueryValueStruct
-   ☐ ARArithOpStruct
 
 Additional features:
  ☐ Determine if we can test authentication against the user
@@ -14,3 +8,4 @@ Additional features:
  ☐ Implement multiple caching backends
  ☐ Implement query enums if possible
  ☐ Support for Windows
+ ☐ Support for 32-bit Linux systems
