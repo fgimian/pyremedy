@@ -335,6 +335,38 @@ class AREntryIdList(Structure):
     ]
 
 
+class ARAccessNameList(Structure):
+    """List of 0 or more access names (ar.h line 374)."""
+    _fields_ = [
+        ('numItems', c_uint),
+        ('nameList', POINTER(ARAccessNameType))
+    ]
+
+
+class ARTextStringList(Structure):
+    """List of 0 or more character strings (ar.h line 403)."""
+    _fields_ = [
+        ('numItems', c_uint),
+        ('stringList', POINTER(c_char_p))
+    ]
+
+
+class ARTimestampList(Structure):
+    """List of 0 or more timestamps (ar.h line 411)."""
+    _fields_ = [
+        ('numItems', c_uint),
+        ('timestampList', POINTER(ARTimestamp))
+    ]
+
+
+class ARUnsignedIntList(Structure):
+    """List of 0 or more unsigned integers (ar.h line 419)."""
+    _fields_ = [
+        ('numItems', c_uint),
+        ('intList', POINTER(c_uint))
+    ]
+
+
 class ARByteList(Structure):
     """Byte stream (ar.h line 447)."""
     _fields_ = [
@@ -727,6 +759,101 @@ ARQualifierStruct._fields_ = [
 ]
 
 
+class ARSortStruct(Structure):
+    """Sort criteria (ar.h line 1216)."""
+    _fields_ = [
+        ('fieldId', ARInternalId),
+        ('sortOrder', c_uint)
+    ]
+
+
+class ARSortList(Structure):
+    """List of 0 or more sort criteria (ar.h line 1224)."""
+    _fields_ = [
+        ('numItems', c_uint),
+        ('sortList', POINTER(ARSortStruct))
+    ]
+
+
+class ARPropStruct(Structure):
+    """A display/object property (ar.h line 1388)."""
+    _fields_ = [
+        # AR_*PROP_*; property tag
+        ('prop', ARULong32),
+        ('value', ARValueStruct)
+    ]
+
+
+class ARPropList(Structure):
+    """List of 0 or more display/object properties (ar.h line 1396)."""
+    _fields_ = [
+        ('numItems', c_uint),
+        ('props', POINTER(ARPropStruct))
+    ]
+
+
+class ARPropListList(Structure):
+    """List of 0 or more display/object properties lists (ar.h line 1404)."""
+    _fields_ = [
+        ('numItems', c_uint),
+        ('propsList', POINTER(ARPropList))
+    ]
+
+
+class ARDisplayInstanceStruct(Structure):
+    """A display instance (ar.h line 1412)."""
+    _fields_ = [
+        # VUI to which display belongs
+        ('vui', ARInternalId),
+        # properties specific to the vui
+        ('props', ARPropList)
+    ]
+
+
+class ARDisplayInstanceList(Structure):
+    """List of 0 or more display instances (ar.h line 1420)."""
+    _fields_ = [
+        # properties common across displays
+        ('commonProps', ARPropList),
+        # properties specific to one display
+        # ASSERT ALIGN(this.numItems) >= ALIGN_NEEDED_BY(this.dInstanceList)
+        ('numItems', c_uint),
+        ('dInstanceList', POINTER(ARDisplayInstanceStruct))
+    ]
+
+
+class ARDisplayInstanceListList(Structure):
+    """List of 0 or more display instance lists (ar.h line 1431)."""
+    _fields_ = [
+        ('numItems', c_uint),
+        ('dInstanceList', POINTER(ARDisplayInstanceList))
+    ]
+
+
+class ARPermissionStruct(Structure):
+    """A group and the permissions defined (ar.h line 3564)."""
+    _fields_ = [
+        ('groupId', ARInternalId),
+        ('permissions', c_uint)
+    ]
+
+
+class ARPermissionList(Structure):
+    """List of 0 or more permission entries (ar.h line 3571)."""
+    _fields_ = [
+        ('numItems', c_uint),
+        ('permissionList', POINTER(ARPermissionStruct))
+    ]
+
+
+class ARPermissionListList(Structure):
+    """List of 0 or more permission lists (ar.h line 3578)."""
+    _fields_ = [
+        ('numItems', c_uint),
+        ('permissionList', POINTER(ARPermissionList))
+    ]
+
+
 class ARIntegerLimitsStruct(Structure):
     """Integer limits (ar.h line 3780)."""
     _fields_ = [
@@ -961,4 +1088,73 @@ class ARFieldLimitList(Structure):
     _fields_ = [
         ('numItems', c_uint),
         ('fieldLimitList', POINTER(ARFieldLimitStruct))
+    ]
+
+
+class ARJoinMappingStruct(Structure):
+    """Join field mapping (ar.h line 5453)."""
+    _fields_ = [
+        # 0 - primary, 1 - secondary
+        ('schemaIndex', c_uint),
+        # field id of member schema
+        ('realId', ARInternalId)
+    ]
+
+
+class ARViewMappingStruct(Structure):
+    """View field mapping (ar.h line 5460)."""
+    _fields_ = [
+        # field name of external table
+        ('fieldName', ARNameType)
+    ]
+
+
+class ARVendorMappingStruct(Structure):
+    """Vendor field mapping (ar.h line 5466)."""
+    _fields_ = [
+        # field name in external table
+        ('fieldName', ARNameType)
+    ]
+
+
+class ARInheritanceMappingStruct(Structure):
+    """Inheritance field mapping (ar.h line 5472)."""
+    _fields_ = [
+        # NULL means this is not a reference field
+        ('srcSchema', ARNameType),
+        # a bitmask indicates which field characteristics are inherited. For
+        # each bit, 1 means it is inherited, 0 means it is overwritten.  This
+        # only has meaning if srcSchema is not an empty string
+        ('referenceMask', c_uint),
+        # 0 means field doesn't reference DATA
+        ('dataMappingId', c_uint)
+    ]
+
+
+class ARFieldMappingUnion(Union):
+    """Union relating to a field mapping (ar.h line 5489)."""
+    _fields_ = [
+        ('join', ARJoinMappingStruct),
+        ('view', ARViewMappingStruct),
+        ('vendor', ARVendorMappingStruct),
+        ('inheritance', ARInheritanceMappingStruct)
+    ]
+
+
+class ARFieldMappingStruct(Structure):
+    """Structure relating to a field mapping from each field in a schema to a
+    field in an underlying base schema (ar.h line 5489).
+    """
+
+    _fields_ = [
+        ('fieldType', c_uint),
+        ('u', ARFieldMappingUnion)
+    ]
+
+
+class ARFieldMappingList(Structure):
+    """"List of 0 or more field mappings (ar.h line 5502)."""
+    _fields_ = [
+        ('numItems', c_uint),
+        ('mappingList', POINTER(ARFieldMappingStruct))
     ]
