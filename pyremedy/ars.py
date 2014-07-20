@@ -2,8 +2,7 @@ from __future__ import print_function
 
 from collections import OrderedDict
 from ctypes import (
-    CDLL, sizeof, cast, byref, memset, c_char_p, c_int, c_uint, POINTER,
-    create_string_buffer
+    CDLL, sizeof, cast, byref, memset, c_char_p, c_int, c_uint, POINTER
 )
 from datetime import datetime
 
@@ -104,6 +103,9 @@ class ARS(object):
 
         self.arlib.FreeARStatusList(byref(self.status), arh.FALSE)
 
+        server_artype = arh.ARNameType()
+        server_artype.value = self.control.server
+
         # Set the server port and/or RPC program number (if specified)
         if port or rpc_program_number:
             if (
@@ -111,7 +113,7 @@ class ARS(object):
                     # ARControlStruct *control: the control record
                     byref(self.control),
                     # ARNameType server: the server to update with the port
-                    create_string_buffer(self.control.server, 255),
+                    server_artype,
                     # int port: the port number
                     port,
                     # int rpcProgramNum: the RPC program of the server
@@ -165,6 +167,8 @@ class ARS(object):
         if self.schema_cache is not None:
             return self.schema_cache
 
+        name_artype = arh.ARNameType()
+        name_artype.value = ''
         schema_list = arh.ARNameList()
 
         if (
@@ -178,7 +182,7 @@ class ARS(object):
                 arh.AR_LIST_SCHEMA_ALL,
                 # ARNameType name: specify which form this depends on (ignored
                 # with our schemaType)
-                create_string_buffer('', 255),
+                name_artype,
                 # ARInternalIdList *fieldIdList: filter the schemas by a given
                 # set of fields
                 None,
@@ -266,6 +270,8 @@ class ARS(object):
                 self.field_name_to_id_cache[schema][field]
             )
 
+        schema_artype = arh.ARNameType()
+        schema_artype.value = schema
         field_value_list = arh.ARFieldValueList()
 
         if (
@@ -273,7 +279,7 @@ class ARS(object):
                 # ARControlStruct *control: the control record
                 byref(self.control),
                 # ARNameType schema: the schema to retrieve the entry for
-                create_string_buffer(schema, 255),
+                schema_artype,
                 # AREntryIdList *entryId: the entry id to retrieve
                 byref(entry_id_list),
                 # ARInternalIdList *idList: the field ids to retrieve
@@ -359,7 +365,10 @@ class ARS(object):
                     '{}'.format(field, schema)
                 )
 
-        qualifier_cstring = c_char_p(qualifier)
+        schema_artype = arh.ARNameType()
+        schema_artype.value = schema
+        display_tag_artype = arh.ARNameType()
+        display_tag_artype.value = ''
         qualifier_struct = arh.ARQualifierStruct()
 
         if (
@@ -367,13 +376,13 @@ class ARS(object):
                 # ARControlStruct *control: the control record
                 byref(self.control),
                 # ARNameType schema: the schema to build the qualifier for
-                create_string_buffer(schema, 255),
+                schema_artype,
                 # ARNameType displayTag: the name of the form view to use for
                 # resolving field names
-                create_string_buffer('', 255),
+                display_tag_artype,
                 # char *qualString: the qualification string (query) to search
                 # with
-                qualifier_cstring,
+                c_char_p(qualifier),
 
                 # (return) ARQualifierStruct *qualifier: the newly built
                 # ARQualifierStruct
@@ -417,6 +426,8 @@ class ARS(object):
             # For ARGetListEntryWithFields, set this value to one blank space.
             field_list.fieldsList[i].separator = b' '
 
+        schema_artype = arh.ARNameType()
+        schema_artype.value = schema
         num_matches = c_uint()
         entry_list = arh.AREntryListFieldValueList()
 
@@ -425,7 +436,7 @@ class ARS(object):
                 # ARControlStruct *control: the control record
                 byref(self.control),
                 # ARNameType schema: the schema to get entries for
-                create_string_buffer(schema, 255),
+                schema_artype,
                 # ARQualifierStruct *qualifier: a query specifying entries to
                 # retrieve
                 byref(qualifier_struct),
@@ -563,14 +574,15 @@ class ARS(object):
             ), POINTER(arh.ARFieldValueStruct)
         )
 
-        # Create a variable to store the new entry id
-        entry_id = arh.AREntryIdType()
-
         for i, (field_name, value) in enumerate(entry_values.items()):
             field_id = self.field_name_to_id_cache[schema][field_name]
             self._update_field(
                 schema, field_id, value, field_value_list.fieldValueList[i]
             )
+
+        entry_id_artype = arh.AREntryIdType()
+        schema_artype = arh.ARNameType()
+        schema_artype.value = schema
 
         if (
             self.arlib.ARCreateEntry(
@@ -578,14 +590,14 @@ class ARS(object):
                 byref(self.control),
                 # ARNameType schema: the name of the schema to create the
                 # entry in
-                create_string_buffer(schema, 255),
+                schema_artype,
                 # ARFieldValueList *fieldList: a list of key/value pairs which
                 # identify the data for the new entry
                 byref(field_value_list),
 
                 # (return) AREntryIdType entryId: the entry id of the newly
                 # created entry
-                entry_id,
+                entry_id_artype,
                 # (return) ARStatusList *status: notes, warnings or errors
                 # generated by the operation
                 byref(self.status)
@@ -604,7 +616,7 @@ class ARS(object):
         self.arlib.FreeARStatusList(byref(self.status), arh.FALSE)
 
         # Return the newly created entry id to the caller
-        return entry_id.value
+        return entry_id_artype.value
 
     def update(self, schema, entry_id, entry_values):
         """Updates a chosen entry in a given schema using the provided
@@ -657,13 +669,16 @@ class ARS(object):
                 schema, field_id, value, field_value_list.fieldValueList[i]
             )
 
+        schema_artype = arh.ARNameType()
+        schema_artype.value = schema
+
         if (
             self.arlib.ARSetEntry(
                 # ARControlStruct *control: the control record
                 byref(self.control),
                 # ARNameType schema: the name of the schema containing the
                 # entry to be updated
-                create_string_buffer(schema, 255),
+                schema_artype,
                 # AREntryIdList *entryId: the id of the entry to update
                 byref(entry_id_list),
                 # ARFieldValueList *fieldList: a list of key/value pairs to
@@ -705,6 +720,9 @@ class ARS(object):
         :raises: ARSError
         """
 
+        schema_artype = arh.ARNameType()
+        schema_artype.value = schema
+
         entry_id_list = arh.AREntryIdList()
         entry_id_list.numItems = 1
         entry_id_list.entryIdList = cast(
@@ -720,7 +738,7 @@ class ARS(object):
                 byref(self.control),
                 # ARNameType schema: the name of the schema containing the
                 # entry to be deleted
-                create_string_buffer(schema, 255),
+                schema_artype,
                 # AREntryIdList *entryId: the entry to delete
                 byref(entry_id_list),
                 # unsigned int option: the policy used when deleting the entry
@@ -762,7 +780,9 @@ class ARS(object):
         ):
             return
 
-        # Retrieve a list of IDs for a given form
+        schema_artype = arh.ARNameType()
+        schema_artype.value = schema
+
         field_id_list = arh.ARInternalIdList()
 
         if (
@@ -770,7 +790,7 @@ class ARS(object):
                 # ARControlStruct *control: the control record
                 byref(self.control),
                 # ARNameType schema: the schema to get field ids for
-                create_string_buffer(schema, 255),
+                schema_artype,
                 # unsigned long fieldType: bitmask indicating what field types
                 # we want
                 arh.AR_FIELD_TYPE_DATA,
@@ -807,7 +827,7 @@ class ARS(object):
                 # ARControlStruct *control: the control record
                 byref(self.control),
                 # ARNameType schema: the scehma to get fields for
-                create_string_buffer(schema, 255),
+                schema_artype,
                 # ARInternalIdList *fieldId: the field ids to retrieve
                 byref(field_id_list),
 
