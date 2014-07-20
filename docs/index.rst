@@ -100,13 +100,6 @@ below::
     finally:
         ars.terminate()
 
-.. warning::
-
-    Being ctypes-based, PyRemedy is extremely sensitive to incorrect data
-    types being passed into methods.  Segmentation faults and other funky
-    behaviour are to be expected if invalid data types are passed in so please
-    take care.
-
 Development Notes
 -----------------
 

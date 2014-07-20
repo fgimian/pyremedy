@@ -1,8 +1,4 @@
 Future improvements:
- ☐ More robust type checking to avoid segmentatino faults
-   It would be ideal if we threw a suitable exception any time an invalid type
-   was provided as sending the wrote types to the Remedy C API via ctypes
-   naturally causes segmentation faults and other strange behaviour.
  ☐ Ensure that date timezone conversion is correct
    I'm currently simply using datetime.fromtimestamp to convert epoch
    timestamps returned from Remedy but this assumes that Remedy's timezone
