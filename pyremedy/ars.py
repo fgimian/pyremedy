@@ -1144,7 +1144,7 @@ class ARS(object):
         elif data_type == arh.AR_DATA_TYPE_REAL:
             return value_struct.u.realVal
         elif data_type == arh.AR_DATA_TYPE_CHAR:
-            return str(value_struct.u.charVal)
+            return value_struct.u.charVal
         elif data_type == arh.AR_DATA_TYPE_ENUM:
             return (
                 self.enum_id_to_name_cache[schema][field_id][value_struct.u.enumVal]
@@ -1211,10 +1211,10 @@ class ARS(object):
         # Go through each error present and add them to the errors list
         for i in range(self.status.numItems):
             message_number = self.status.statusList[i].messageNum
-            message_text = str(self.status.statusList[i].messageText)
+            message_text = self.status.statusList[i].messageText
             appended_text = None
 
             if self.status.statusList[i].appendedText:
-                appended_text = str(self.status.statusList[i].appendedText)
+                appended_text = self.status.statusList[i].appendedText
 
             self.errors.append((message_number, message_text, appended_text))
