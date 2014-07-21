@@ -2,6 +2,11 @@
 
 *A simple remedy for remedy*
 
+![PyRemedy Logo](https://raw.githubusercontent.com/fgimian/pyremedy/master/images/pyremedy_logo.png)
+
+Awesome artwork provided courtesy of
+[Open Clip Art Library](http://openclipart.org/detail/192888/tux-nurse-1-by-merlin2525-192888)
+
 ## Introduction ##
 
 PyRemedy is a simple library for interacting with Remedy ARS in Python.  It
@@ -14,7 +19,9 @@ Remedy ARS similar to PyARS.
 
 ## Documentation ##
 
-Please refer to the Sphinx documentation for instructions on using PyRemedy.  
+Please check out the
+[PyRemedy documentation at Read the Docs](http://pyremedy.readthedocs.org/).
+
 You may generate the documentation as follows:
 
 ``` python
