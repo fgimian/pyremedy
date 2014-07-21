@@ -3,6 +3,9 @@ Future improvements:
    I'm currently simply using datetime.fromtimestamp to convert epoch
    timestamps returned from Remedy but this assumes that Remedy's timezone
    is the same as the server running the script.
+ ☐ Support attachment fields
+   It would be ideal to support downloading and uploading attachments using
+   Remedy attachment fields.
  ☐ Determine if we can test authentication against the user
    The ARVerifyUser function never seems to return errors when used with the
    8.x version of the Remedy API.  At present, it's only possible to know if
