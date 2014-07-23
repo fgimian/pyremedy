@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 from collections import OrderedDict
 from ctypes import (
     CDLL, sizeof, cast, byref, memset, c_char_p, c_int, c_uint, c_size_t,
