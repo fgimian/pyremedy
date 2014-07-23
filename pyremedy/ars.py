@@ -2,7 +2,8 @@ from __future__ import print_function
 
 from collections import OrderedDict
 from ctypes import (
-    CDLL, sizeof, cast, byref, memset, c_char_p, c_int, c_uint, POINTER
+    CDLL, sizeof, cast, byref, memset, c_char_p, c_int, c_uint, c_size_t,
+    c_void_p, POINTER
 )
 from datetime import datetime
 
@@ -61,6 +62,9 @@ class ARS(object):
 
         #: A cache containing enum name to id mappings for a particular field
         self.enum_name_to_id_cache = {}
+
+        # Explicitly define argument and return types for C functions
+        self._register_clib_functions()
 
         # Explicitly define argument and return types for Remedy functions
         self._register_arlib_functions()
@@ -382,7 +386,7 @@ class ARS(object):
                 display_tag_artype,
                 # char *qualString: the qualification string (query) to search
                 # with
-                c_char_p(qualifier),
+                qualifier,
 
                 # (return) ARQualifierStruct *qualifier: the newly built
                 # ARQualifierStruct
@@ -978,6 +982,25 @@ class ARS(object):
         self.arlib.FreeARNameList(byref(field_name_list), arh.FALSE)
         self.arlib.FreeARStatusList(byref(self.status), arh.FALSE)
 
+    def _register_clib_functions(self):
+        """Explicitly define argument and return types for C functions"""
+        # strdup (string.h)
+        self.clib.strdup.argtypes = [c_char_p]
+        # Please note that the return value of strdup is actually char * but
+        # we can't use this or Python will convert the result into a Python
+        # string which isn't what we want.  Instead, we return a void * (or
+        # alternatively we could have returned POINTER(c_char)) and cast that
+        # result to a c_char_p.
+        self.clib.strdup.restype = c_void_p
+
+        # calloc (stdlib.h)
+        self.clib.calloc.argtypes = [c_size_t, c_size_t]
+        self.clib.calloc.restype = c_void_p
+
+        # malloc (stdlib.h)
+        self.clib.malloc.argtypes = [c_size_t]
+        self.clib.malloc.restype = c_void_p
+
     def _register_arlib_functions(self):
         """Explicitly define argument and return types for Remedy functions."""
         # ARCreateEntry
@@ -1214,7 +1237,9 @@ class ARS(object):
                 )
             # Note that we must allocate a new block of memory using
             # strdup or we end up with a nasty invalid pointer error
-            field_value_struct.value.u.charVal = self.clib.strdup(value)
+            field_value_struct.value.u.charVal = cast(
+                self.clib.strdup(value), c_char_p
+            )
         elif data_type == arh.AR_DATA_TYPE_ENUM:
             try:
                 enum_id = self.enum_name_to_id_cache[schema][field_id][value]
