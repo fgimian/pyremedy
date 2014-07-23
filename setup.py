@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='pyremedy',
-    version='0.3-dev',
+    version='0.2.1',
     url='https://github.com/fgimian/pyremedy',
     license='MIT',
     author='Fotis Gimian',
