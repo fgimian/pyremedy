@@ -141,6 +141,9 @@ class ARS(object):
         :raises: ARSError
         """
 
+        # Clear previous errors
+        self.errors = []
+
         if (
             self.arlib.ARTermination(
                 # ARControlStruct *control: the control record
@@ -164,6 +167,9 @@ class ARS(object):
         :return: a list of schema names
         :raises: ARSError
         """
+
+        # Clear previous errors
+        self.errors = []
 
         # Use the cache if possible
         if self.schema_cache is not None:
@@ -220,7 +226,10 @@ class ARS(object):
         :raises: ARSError
         """
 
+        # Ensure we have all field and enum details for the schema
         self.update_fields(schema)
+
+        # Return just the field names of the selected schema
         return self.field_name_to_id_cache[schema].keys()
 
     def get(self, schema, entry_id, fields):
@@ -722,6 +731,9 @@ class ARS(object):
         :raises: ARSError
         """
 
+        # Clear previous errors
+        self.errors = []
+
         schema_artype = arh.ARNameType()
         schema_artype.value = schema
 
@@ -771,6 +783,9 @@ class ARS(object):
         :param str schema: the schema name to retrieve field information for
         :raises: ARSError
         """
+
+        # Clear previous errors
+        self.errors = []
 
         # Use the cache if possible
         if (
@@ -1262,9 +1277,6 @@ class ARS(object):
         :param str schema: the schema name related to the error (only required
                            for create and update operations)
         """
-
-        # Clear previous errors
-        self.errors = []
 
         # Go through each error present and add them to the errors list
         for i in range(self.status.numItems):
