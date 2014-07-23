@@ -605,7 +605,7 @@ class ARS(object):
                 byref(self.status)
             ) >= arh.AR_RETURN_ERROR
         ):
-            self._update_errors()
+            self._update_errors(schema)
             self.arlib.FreeARFieldValueList(
                 byref(field_value_list), arh.FALSE
             )
@@ -699,7 +699,7 @@ class ARS(object):
                 byref(self.status)
             ) >= arh.AR_RETURN_ERROR
         ):
-            self._update_errors()
+            self._update_errors(schema)
             self.arlib.FreeAREntryIdList(byref(entry_id_list), arh.FALSE)
             self.arlib.FreeARFieldValueList(byref(field_value_list), arh.FALSE)
             self.arlib.FreeARStatusList(byref(self.status), arh.FALSE)
@@ -1255,9 +1255,12 @@ class ARS(object):
                 'on schema {}'.format(field_name, schema)
             )
 
-    def _update_errors(self):
+    def _update_errors(self, schema=None):
         """Updates the errors attribute with any errors that occurred on the
         last operation based on the status struct.
+
+        :param str schema: the schema name related to the error (only required
+                           for create and update operations)
         """
 
         # Clear previous errors
@@ -1270,6 +1273,20 @@ class ARS(object):
             appended_text = None
 
             if self.status.statusList[i].appendedText:
-                appended_text = self.status.statusList[i].appendedText
+                # If a schema is specified and we encounter one of the
+                # following errors, we must map field ids to names in the
+                # appended text field of the error.
+                # ARERR 307: Required field (without a default) not specified
+                # ARERR 326: Required field cannot be reset to a NULL value
+                if schema and message_number in [307, 326]:
+                    try:
+                        field_id = int(self.status.statusList[i].appendedText)
+                        appended_text = (
+                            self.field_id_to_name_cache[schema][field_id]
+                        )
+                    except (ValueError, IndexError):
+                        appended_text = self.status.statusList[i].appendedText
+                else:
+                    appended_text = self.status.statusList[i].appendedText
 
             self.errors.append((message_number, message_text, appended_text))
