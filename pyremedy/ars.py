@@ -1206,11 +1206,23 @@ class ARS(object):
         elif data_type == arh.AR_DATA_TYPE_REAL:
             field_value_struct.value.u.realVal = value
         elif data_type == arh.AR_DATA_TYPE_CHAR:
+            # Ensure that we don't pass a NULL pointer into strdup
+            if value is None:
+                raise ARSError(
+                    'The value specified for field name {} on schema {} '
+                    'cannot be None'.format(field_name, schema)
+                )
             # Note that we must allocate a new block of memory using
             # strdup or we end up with a nasty invalid pointer error
             field_value_struct.value.u.charVal = self.clib.strdup(value)
         elif data_type == arh.AR_DATA_TYPE_ENUM:
-            enum_id = self.enum_name_to_id_cache[schema][field_id][value]
+            try:
+                enum_id = self.enum_name_to_id_cache[schema][field_id][value]
+            except KeyError:
+                raise ARSError(
+                    'An invalid value {} was specified for field name {} '
+                    'on schema {}'.format(value, field_name, schema)
+                )
             field_value_struct.value.u.enumVal = enum_id
         elif data_type == arh.AR_DATA_TYPE_TIME:
             field_value_struct.value.u.timeVal = value.strftime('%s')
