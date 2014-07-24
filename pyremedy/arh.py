@@ -252,6 +252,8 @@ AR_LIST_SCHEMA_ALL_WITH_DATA = 7
 AR_LIST_SCHEMA_VENDOR = 8
 # get list of all schemas allowed in multi-form searches
 AR_LIST_SCHEMA_ALLOWED_IN_MFSEARCH = 9
+# code added to above to "include hidden schemas" in the list returned
+AR_HIDDEN_INCREMENT = 1024
 
 # SetEntry options (ar.h line 5555).
 

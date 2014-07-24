@@ -187,7 +187,7 @@ class ARS(object):
                 # modification timestamp
                 0,
                 # unsigned int schemaType: get all schemas
-                arh.AR_LIST_SCHEMA_ALL,
+                arh.AR_LIST_SCHEMA_ALL | arh.AR_HIDDEN_INCREMENT,
                 # ARNameType name: specify which form this depends on (ignored
                 # with our schemaType)
                 name_artype,
