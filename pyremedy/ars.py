@@ -1,7 +1,7 @@
 from collections import OrderedDict
 from ctypes import (
     CDLL, sizeof, cast, byref, memset, c_char_p, c_int, c_uint, c_size_t,
-    c_void_p, POINTER
+    c_void_p, string_at, POINTER
 )
 from datetime import datetime
 
@@ -1281,9 +1281,8 @@ class ARS(object):
                 'id {} from schema {}'.format(field_id, entry_id, schema)
             )
 
-        contents = ''.join(
-            chr(location_struct.u.buf.buffer[i])
-            for i in range(location_struct.u.buf.bufSize)
+        contents = string_at(
+            location_struct.u.buf.buffer, location_struct.u.buf.bufSize
         )
 
         self.arlib.FreeAREntryIdList(entry_id_list, arh.FALSE)
