@@ -99,7 +99,7 @@ class ARS(object):
             self._update_errors()
             self.arlib.FreeARStatusList(byref(self.status), arh.FALSE)
             raise ARSError(
-                'Enable to perform initialisation against server '
+                'Unable to perform initialisation against server '
                 '{}'.format(server)
             )
 
@@ -322,7 +322,7 @@ class ARS(object):
             value_struct = field_value_list.fieldValueList[i].value
             try:
                 entry_values[field_name] = self._extract_field(
-                    schema, field_id, value_struct
+                    schema, entry_id, field_id, value_struct
                 )
             except ARSError:
                 self.arlib.FreeAREntryIdList(byref(entry_id_list), arh.FALSE)
@@ -526,7 +526,7 @@ class ARS(object):
                 # Extract the appropriate piece of data depending on its type
                 try:
                     entry_values[field_name] = self._extract_field(
-                        schema, field_id, value_struct
+                        schema, entry_id, field_id, value_struct
                     )
                 except ARSError:
                     self.arlib.FreeARQualifierStruct(
@@ -1039,6 +1039,14 @@ class ARS(object):
         ]
         self.arlib.ARGetEntry.restype = c_int
 
+        # ARGetEntryBLOB
+        self.arlib.ARGetEntryBLOB.argtypes = [
+            POINTER(arh.ARControlStruct), arh.ARNameType,
+            POINTER(arh.AREntryIdList), arh.ARInternalId,
+            POINTER(arh.ARLocStruct), POINTER(arh.ARStatusList)
+        ]
+        self.arlib.ARGetEntryBLOB.restype = c_int
+
         # ARGetListEntryWithFields
         self.arlib.ARGetListEntryWithFields.argtypes = [
             POINTER(arh.ARControlStruct), arh.ARNameType,
@@ -1172,12 +1180,13 @@ class ARS(object):
         ]
         self.arlib.FreeARStatusList.restype = None
 
-    def _extract_field(self, schema, field_id, value_struct):
+    def _extract_field(self, schema, entry_id, field_id, value_struct):
         """Returns the appropriate value for the schema and field id requested
         given a particular value structure.
 
         :param str schema: the schema name related to the field you're extract
                            data for
+        :param str entry_id: the entry id of the entry that's retrieved
         :param str field_id: the field id of the schema being retrieved
         :param ARValueStruct value_struct: the Remedy ARValueStruct containing
                                            the data
@@ -1207,11 +1216,80 @@ class ARS(object):
             )
         elif data_type == arh.AR_DATA_TYPE_TIME:
             return datetime.fromtimestamp(value_struct.u.timeVal)
+        elif data_type == arh.AR_DATA_TYPE_ATTACH:
+            filename = value_struct.u.attachVal.contents.name
+            contents = self._extract_attachment(schema, entry_id, field_id)
+            return filename, contents
         else:
             raise ARSError(
                 'An unknown data type was encountered for field name '
                 '{} on schema {}'.format(field_name, schema)
             )
+
+    def _extract_attachment(self, schema, entry_id, field_id):
+        """Returns the attachment contained in the schema for the given entry
+        id and field id.
+
+        :param str schema: the schema name related to the attachment you're
+                           extracting
+        :param str entry_id: the entry id of the entry that's retrieved
+        :param str field_id: the field id of the attachment being retrieved
+        :return: the contents of the attachment as a string
+        :raises: ARSError
+        """
+        schema_artype = arh.ARNameType()
+        schema_artype.value = schema
+
+        entry_id_list = arh.AREntryIdList()
+        entry_id_list.numItems = 1
+        entry_id_list.entryIdList = cast(
+            self.clib.malloc(
+                entry_id_list.numItems * sizeof(arh.AREntryIdType)
+            ), POINTER(arh.AREntryIdType)
+        )
+        entry_id_list.entryIdList[0].value = entry_id
+
+        location_struct = arh.ARLocStruct()
+        location_struct.locType = arh.AR_LOC_BUFFER
+
+        if (
+            self.arlib.ARGetEntryBLOB(
+                # ARControlStruct *control: the control record
+                byref(self.control),
+                # ARNameType schema: the schema containing the attachment
+                schema_artype,
+                # AREntryIdList *entryId: the id of the entry to retrieve
+                # the attachment for
+                byref(entry_id_list),
+                # ARInternalId id: the field id that contains the attachment
+                field_id,
+                # ARLocStruct *loc: a pointer to a ARLocStruct structure that
+                # specifies how you want the contents of the blob returned
+                # (AR_LOC_FILENAME or AR_LOC_BUFFER)
+                byref(location_struct),
+
+                # (return) ARStatusList *status: notes, warnings or errors
+                # generated by the operation
+                byref(self.status)
+            ) >= arh.AR_RETURN_ERROR
+        ):
+            self._update_errors()
+            self.arlib.FreeAREntryIdList(entry_id_list, arh.FALSE)
+            self.arlib.FreeARStatusList(self.status, arh.FALSE)
+            raise ARSError(
+                'Unable to retrieve attachment for field id {} on entry with '
+                'id {} from schema {}'.format(field_id, entry_id, schema)
+            )
+
+        contents = ''.join(
+            chr(location_struct.u.buf.buffer[i])
+            for i in range(location_struct.u.buf.bufSize)
+        )
+
+        self.arlib.FreeAREntryIdList(entry_id_list, arh.FALSE)
+        self.arlib.FreeARStatusList(self.status, arh.FALSE)
+
+        return contents
 
     def _update_field(self, schema, field_id, value, field_value_struct):
         """Updates a provided ARFieldValueStruct item with the appropriate

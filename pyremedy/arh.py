@@ -211,6 +211,15 @@ AR_FIELD_TYPE_ATTACH = 128
 # attachment pool type
 AR_FIELD_TYPE_ATTACH_POOL = 256
 
+# Attachment location types (ar.h line 709)
+
+# reserved for future use
+AR_LOC_NULL = 0
+# store and retrieve via filename
+AR_LOC_FILENAME = 1
+# store and retrieve via memory buffer
+AR_LOC_BUFFER = 2
+
 # Entry retrieval limits (ar.h line 841).
 
 # code to indicate should retrieve from result set starting with first entry
