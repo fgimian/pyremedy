@@ -1,3 +1,3 @@
 class ARSError(Exception):
-    """A generic high-level ARS exception"""
+    """A generic high-level ARS exception."""
     pass

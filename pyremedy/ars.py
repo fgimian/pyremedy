@@ -10,7 +10,8 @@ from .exceptions import ARSError
 
 
 class ARS(object):
-    """The ARS object implements a simple CRUD interface for Remedy ARS
+    """
+    The ARS object implements a simple CRUD interface for Remedy ARS
     servers.  It is passed server details and credentials and acts as the main
     object which talks to Remedy ARS.
 
@@ -136,7 +137,8 @@ class ARS(object):
             self.arlib.FreeARStatusList(byref(self.status), arh.FALSE)
 
     def terminate(self):
-        """Perform a cleanup and disconnect the session
+        """
+        Perform a cleanup and disconnect the session.
 
         :raises: ARSError
         """
@@ -161,8 +163,9 @@ class ARS(object):
         self.arlib.FreeARStatusList(byref(self.status), arh.FALSE)
 
     def schemas(self):
-        """Retrieves a list of all available schemas on the specified Remedy
-        ARS server
+        """
+        Retrieves a list of all available schemas on the specified Remedy
+        ARS server.
 
         :return: a list of schema names
         :raises: ARSError
@@ -220,7 +223,8 @@ class ARS(object):
         return self.schema_cache
 
     def fields(self, schema):
-        """Returns a list of field names provided by a selected schema
+        """
+        Returns a list of field names provided by a selected schema.
 
         :param str schema: the schema name to retrieve field names for
         :raises: ARSError
@@ -233,7 +237,8 @@ class ARS(object):
         return self.field_name_to_id_cache[schema].keys()
 
     def get(self, schema, entry_id, fields):
-        """Retrieves a particular entry in the requested schema using the
+        """
+        Retrieves a particular entry in the requested schema using the
         given entry id.
 
         :param str schema: the schema name to retrieve the entry for
@@ -346,7 +351,8 @@ class ARS(object):
         self, schema, qualifier, fields, offset=arh.AR_START_WITH_FIRST_ENTRY,
         limit=arh.AR_NO_MAX_LIST_RETRIEVE
     ):
-        """Runs a specified qualification string against a chosen schema and
+        """
+        Runs a specified qualification string against a chosen schema and
         returns the all related records with the fields specified by the
         caller.
 
@@ -551,7 +557,8 @@ class ARS(object):
         return entries
 
     def create(self, schema, entry_values):
-        """Creates a new entry in a given schema using the provided entry
+        """
+        Creates a new entry in a given schema using the provided entry
         values.
 
         :param str schema: the schema where the entry is to be created
@@ -630,7 +637,8 @@ class ARS(object):
         return entry_id_artype.value
 
     def update(self, schema, entry_id, entry_values):
-        """Updates a chosen entry in a given schema using the provided
+        """
+        Updates a chosen entry in a given schema using the provided
         entry values.
 
         :param str schema: the schema where the entry is located
@@ -723,7 +731,8 @@ class ARS(object):
         self.arlib.FreeARStatusList(byref(self.status), arh.FALSE)
 
     def delete(self, schema, entry_id):
-        """Deletes a particular entry in the requested schema using the
+        """
+        Deletes a particular entry in the requested schema using the
         given entry id.
 
         :param str schema: the schema name to delete the entry from
@@ -776,7 +785,8 @@ class ARS(object):
         self.arlib.FreeARStatusList(byref(self.status), arh.FALSE)
 
     def update_fields(self, schema):
-        """Determines the field IDs for all data fields on a chosen schema and
+        """
+        Determines the field IDs for all data fields on a chosen schema and
         then retrieves the related field names and enum mappings.  This method
         assumes that all field names are unique.
 
@@ -996,7 +1006,7 @@ class ARS(object):
         self.arlib.FreeARStatusList(byref(self.status), arh.FALSE)
 
     def _register_clib_functions(self):
-        """Explicitly define argument and return types for C functions"""
+        """Explicitly define argument and return types for C functions."""
         # strdup (string.h)
         self.clib.strdup.argtypes = [c_char_p]
         # Please note that the return value of strdup is actually char * but
@@ -1173,7 +1183,8 @@ class ARS(object):
         self.arlib.FreeARStatusList.restype = None
 
     def _extract_field(self, schema, field_id, value_struct):
-        """Returns the appropriate value for the schema and field id requested
+        """
+        Returns the appropriate value for the schema and field id requested
         given a particular value structure.
 
         :param str schema: the schema name related to the field you're extract
@@ -1214,7 +1225,8 @@ class ARS(object):
             )
 
     def _update_field(self, schema, field_id, value, field_value_struct):
-        """Updates a provided ARFieldValueStruct item with the appropriate
+        """
+        Updates a provided ARFieldValueStruct item with the appropriate
         field information based on the type of value provided.
 
         :param str schema: the schema name related to the field you're updating
@@ -1271,7 +1283,8 @@ class ARS(object):
             )
 
     def _update_errors(self, schema=None):
-        """Updates the errors attribute with any errors that occurred on the
+        """
+        Updates the errors attribute with any errors that occurred on the
         last operation based on the status struct.
 
         :param str schema: the schema name related to the error (only required

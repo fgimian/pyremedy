@@ -395,7 +395,8 @@ class ARLocalizationInfo(Structure):
 
 
 class ARControlStruct(Structure):
-    """Control record containing information about the user and the
+    """
+    Control record containing information about the user and the
     environment (ar.h line 467).  An instance of this structure will be the
     first parameter of all the calls supported by the AR system.
 
@@ -562,7 +563,8 @@ class ARValueUnion(Union):
 
 
 class ARValueStruct(Structure):
-    """Structure used to hold a value (ar.h line 777).  There is one branch
+    """
+    Structure used to hold a value (ar.h line 777).  There is one branch
     for each datatype/property that is supported by the system.
     """
 
@@ -615,7 +617,8 @@ class ARFieldValueList(Structure):
 
 
 class AREntryListFieldValueStruct(Structure):
-    """Parallel entry list structures which are used to return entryList as a
+    """
+    Parallel entry list structures which are used to return entryList as a
     list of entryId and entry as field/value pairs (ar.h line 933).
     """
 
@@ -642,7 +645,8 @@ class ARBooleanList(Structure):
 
 
 class ARStatHistoryValue(Structure):
-    """Special selection field that stores user and time stamp information for
+    """
+    Special selection field that stores user and time stamp information for
     each of the defined status values (ar.h line 1036).
     """
 
@@ -653,7 +657,8 @@ class ARStatHistoryValue(Structure):
 
 
 class ARCurrencyPartStruct(Structure):
-    """Part of a currency field that combine to represent a complete currency
+    """
+    Part of a currency field that combine to represent a complete currency
     value (ar.h line 1067).
     """
 
@@ -665,7 +670,8 @@ class ARCurrencyPartStruct(Structure):
 
 
 class ARQualifierStruct(Structure):
-    """Structure used to hold a qualification which entries to retrieve when
+    """
+    Structure used to hold a qualification which entries to retrieve when
     creating a query result list (ARGetListEntry) or computing entry statistics
     (ARGetEntryStatistics) (ar.h line 1029 and 1189).
     """
@@ -690,7 +696,8 @@ class ARArithOpStruct(Structure):
 
 
 class ARFieldValueOrArithUnion(Union):
-    """Union used to hold values to compare in a relational qualification
+    """
+    Union used to hold values to compare in a relational qualification
     operation (ar.h line 1116).
     """
 
@@ -711,7 +718,8 @@ class ARFieldValueOrArithUnion(Union):
 
 
 class ARFieldValueOrArithStruct(Structure):
-    """Structure used to hold values to compare in a relational qualification
+    """
+    Structure used to hold values to compare in a relational qualification
     operation (ar.h line 1116).
     """
 
@@ -1144,7 +1152,8 @@ class ARFieldMappingUnion(Union):
 
 
 class ARFieldMappingStruct(Structure):
-    """Structure relating to a field mapping from each field in a schema to a
+    """
+    Structure relating to a field mapping from each field in a schema to a
     field in an underlying base schema (ar.h line 5489).
     """
 
