@@ -2,9 +2,9 @@
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/fgimian/pyremedy/blob/master/LICENSE)
 
-![PyRemedy Logo](https://raw.githubusercontent.com/fgimian/pyremedy/master/images/pyremedy_logo.png)
+![PyRemedy Logo](https://raw.githubusercontent.com/fgimian/pyremedy/master/images/pyremedy-logo.png)
 
-Awesome artwork provided courtesy of
+Artwork courtesy of
 [Open Clip Art Library](http://openclipart.org/detail/192888/tux-nurse-1-by-merlin2525-192888)
 
 ## Introduction
