@@ -89,3 +89,67 @@ Documentation will then be available under **docs/_build/html/index.html**.
 PyRemedy is released under the **MIT** license. Please see the
 [LICENSE](https://github.com/fgimian/pyremedy/blob/master/LICENSE)
 file for more details.
+
+## TODO
+
+- **Ensure that date timezone conversion is correct**: I'm currently simply
+  using datetime.fromtimestamp to convert epoch timestamps returned from
+  Remedy but this assumes that Remedy's timezone is the same as the server
+  running the script.
+- **Support attachment fields**: It would be ideal to support downloading and
+  uploading attachments using Remedy attachment fields.
+- **Determine if we can test authentication against the user**: The
+  ARVerifyUser function never seems to return errors when used with the
+  8.x version of the Remedy API.  At present, it's only possible to know if
+  your account is invalid when you run a method such as query or create.
+- **Write unit tests for the library**: This is technically difficult to do
+  due to lack of test Remedy server.  A real live server test would really be
+  the best way to test this library and that currently isn't plausible.
+- **Deal with the currency data type if possible**: A few schemas we deal with
+  contain a few fields of type AR_DATA_TYPE_CURRENCY which is not currently
+  handled.  Here's some useful code I wrote to grab details of the currency
+  for when this feature is looked at...
+
+    ```
+    currency_struct = value_struct.u.currencyVal.contents
+    <class 'pyremedy.arh.String'> (e.g. .00)
+    print('value:', currency_struct.value)
+    <type 'str'> (e.g. AUD)
+    print('currencyCode:', currency_struct.currencyCode)
+    <type 'int'> (epoch timestamp)
+    print('conversionDate:', currency_struct.conversionDate)
+    <class 'pyremedy.arh.struct_ARFuncCurrencyList'>
+    print('funcList:', currency_struct.funcList)
+    ```
+
+- **Implement multiple caching backends**: I'm currently using a few dicts to
+  store schemas, field mappings and enum mappings to ensure that we don't
+  unnecessarily hit the Remedy server.  It would be ideal to support a custom
+  caching mechanism so users could use redis or memcache and the results could
+  potentially last a restart (in the case of redis).
+- **Implement query enums if possible**: The third type of enum (query) is not
+  currently supported primarily due to the fact I can't find an example of its
+  use to test and develop against.
+
+    Here's some useful code I wrote to grab details of the query enum...
+
+    ```
+    query_list = field_enum_limits_list.u.queryList
+    print("schema: %s" % query_list.schema)
+    print("server: %s" % query_list.server)
+    qualifier: query_list.qualifier
+    print("nameField: %d" % query_list.nameField)
+    print("numberField: %d" % query_list.numberField)
+    ```
+
+- **Support for Windows**: I haven't really invested any time in attempting to
+  support Windows systems as I don't foresee a big interest in such
+  compatibility.
+- **Support for 32-bit Linux systems**: Due to the fact that 32-bit Remedy C
+  code is heavily affected by the -malign-double option, this is rather tricky
+  to implement.  Firstly, the ctypes _pack_ directive would be required for
+  many of the structs defined, but for these to work, a custom build of Python
+  [repaired a ctypes bug](http://ufpr.dl.sourceforge.net/project/pyars/python-patch/pyars-python272-patch)
+  is also needed.  Further to this, the ARByteList struct will need to be
+  modified to exclude the noval_ attribute in 32-bit systems as is done in
+  the original source code by Remedy.
